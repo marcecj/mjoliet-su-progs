@@ -39,8 +39,8 @@ installed_pkgs = var_tree.getallcpv()
 for p in packages:
     available = portage.portdb.cp_list(p)
     installed = [b for b in available if b in installed_pkgs]
-    av_ver    = unique(['-'.join(portage.pkgsplit(m)[1:]) for m in available])
-    ins_ver   = unique(['-'.join(portage.pkgsplit(m)[1:]) for m in installed])
+    av_ver    = [portage.versions.cpv_getversion(m) for m in available]
+    ins_ver   = [portage.versions.cpv_getversion(m) for m in installed]
 
     if ins_ver:
         try:
