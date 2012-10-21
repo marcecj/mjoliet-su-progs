@@ -2,7 +2,7 @@
 
 import os
 import re
-import subprocess as subp
+import portage
 
 def unique(l):
     l_e = l
@@ -33,42 +33,25 @@ pkg_str = \
 [><=~]?\
 (\w+(?:-\w+)?/\w+(?:-[a-zA-Z]+\w*)*){1}"
 
-# a package version regex:
-#   - ignore slots and overlays, which are surrounded in round and square
-#     brackets, respectively
-#   - a "base" vesion plus zero or more letters
-#   - a version "appendix" (e.g., pre*, p*, rc*)
-#   - the ebuild revision
-ver_str = \
-"(?<!\(|\[)([0-9.]+[a-z]*\
-(?:[_-]?[a-z]*[0-9]+[a-z]*)?\
-(?:-r[0-9]+)?)(?!\)|\])"
-
 # pk_reg = re.compile(pkg_str + "(?:-)?" + ver_str)
 pk_reg = re.compile(pkg_str)
-ver_reg = re.compile(ver_str)
 
 # reg.findall() also returns empty matches, so filter those with a len() check
 packages = [m for l in lines for m in pk_reg.findall(l) if len(m)>0]
 packages = unique(packages)
 
-shell = subp.Popen('sh', stdout=subp.PIPE, stdin=subp.PIPE,
-                   universal_newlines=True)
-
-eix_cmd = "/usr/bin/eix --pure-packages --exact" 
-eix_opt = ("--format '<installedversions:VSORT>\n'",
-            "--format '<availableversions:VSORT>\n'")
-
 max_p_len = max([len(p) for p in packages])
 form_spec = "{0:>" + str(max_p_len) + "}: {1:>12} -> {2:<12}"
 
-for p in packages:
-    installed = subp.getoutput(' '.join([eix_cmd, p, eix_opt[0]]))
-    # print(installed)
-    available = subp.getoutput(' '.join([eix_cmd, p, eix_opt[1]]))
-    ins_ver   = unique([m for m in ver_reg.findall(installed) if len(m)>0])
-    av_ver    = unique([m for m in ver_reg.findall(available) if len(m)>0])
+# get a list of all installed packages
+var_tree = portage.vartree()
+installed_pkgs = var_tree.getallcpv()
 
+for p in packages:
+    available = portage.portdb.cp_list(p)
+    installed = [b for b in available if b in installed_pkgs]
+    av_ver    = unique(['-'.join(portage.pkgsplit(m)[1:]) for m in available])
+    ins_ver   = unique(['-'.join(portage.pkgsplit(m)[1:]) for m in installed])
 
     if ins_ver:
         # cur_ver = [v for v in av_ver if version_is_larger(v, ins_ver[0])]
@@ -96,5 +79,3 @@ for p in packages:
     else:
         if len(av_ver)>0:
             print(form_spec.format(p, '(none)', ', '.join(av_ver)))
-
-shell.communicate('exit'.encode())
