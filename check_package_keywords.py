@@ -5,11 +5,10 @@ import re
 import portage
 
 def unique(l):
-    l_e = l
-    for e in l:
-        while l_e.count(e) > 1:
-            l_e.remove(e)
-    return l_e
+    "Remove redundant entries from a list"
+
+    from itertools import groupby
+    return [a for a,b in groupby(l)]
 
 # read the raw lines from the package.accept_keywords file(s)
 fname = "/etc/portage/package.accept_keywords"
