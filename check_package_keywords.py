@@ -23,21 +23,10 @@ elif os.path.isdir(fname):
             with open(f) as fp:
                 lines += fp.readlines()
 
-# match an uncommented package entry:
-#   - start of the line (0 or more spaces, without a comment)
-#   - the version "range" prefix
-#   - "<base>-<cat>/<name>"
-#   - "-<anything>" (presumably the package version)
-pkg_str = \
-"^\s*#{0}\s*\
-[><=~]?\
-(\w+(?:-\w+)?/\w+(?:-[a-zA-Z]+\w*)*){1}"
-
-pk_reg = re.compile(pkg_str)
-
-# reg.findall() also returns empty matches, so filter those with a len() check
-packages = [m for l in lines for m in pk_reg.findall(l) if len(m)>0]
-packages = unique(packages)
+# find all uncommented, non-empty lines and extract the unique cat/pkg-names
+pk_reg   = re.compile("^\s*(?!#)\s*(.*)")
+packages = [m for l in lines for m in pk_reg.findall(l) if m]
+packages = [portage.dep_getkey(p) for p in unique(packages)]
 
 # generate a format string for printing
 max_p_len = max([len(p) for p in packages])
