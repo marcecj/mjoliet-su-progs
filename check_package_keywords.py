@@ -2,7 +2,8 @@
 
 import os
 import re
-import portage
+from portage import portdb, dep_getkey, vartree
+from portage.versions import cpv_getversion
 
 def unique(l):
     "Remove redundant entries from a list"
@@ -26,21 +27,21 @@ elif os.path.isdir(fname):
 # find all uncommented, non-empty lines and extract the unique cat/pkg-names
 pk_reg   = re.compile("^\s*(?!#)\s*(.*)")
 packages = [m for l in lines for m in pk_reg.findall(l) if m]
-packages = [portage.dep_getkey(p) for p in unique(packages)]
+packages = [dep_getkey(p) for p in unique(packages)]
 
 # generate a format string for printing
 max_p_len = max([len(p) for p in packages])
 form_spec = "{0:>" + str(max_p_len) + "}: {1:>12} -> {2:<12}"
 
 # get a list of all installed packages
-var_tree = portage.vartree()
+var_tree = vartree()
 installed_pkgs = var_tree.getallcpv()
 
 for p in packages:
-    available = portage.portdb.cp_list(p)
+    available = portdb.cp_list(p)
     installed = [b for b in available if b in installed_pkgs]
-    av_ver    = [portage.versions.cpv_getversion(m) for m in available]
-    ins_ver   = [portage.versions.cpv_getversion(m) for m in installed]
+    av_ver    = [cpv_getversion(m) for m in available]
+    ins_ver   = [cpv_getversion(m) for m in installed]
 
     if ins_ver:
         try:
