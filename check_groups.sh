@@ -1,0 +1,28 @@
+#!/bin/sh
+
+print_usage() {
+    echo "Usage: $0 -g user1[,user2,...] -d path1[:path2:...]"
+}
+
+while getopts g:d: opt
+do
+    case $opt in 
+	g) my_groups="$(echo $OPTARG | tr , ' ')";;
+	d) my_paths="$(echo $OPTARG | tr : ' ')";;
+	\?) print_usage; exit 1;;
+    esac
+done
+
+if [ -z "$my_groups" -o -z "$my_paths" ]
+then
+    print_usage
+    exit 1
+fi
+
+for group in $my_groups; do
+  echo "for group $group"
+  for dir in $my_paths; do
+    echo "\tChecking in $dir..."
+    find "$dir" -xdev -user "$group" -print
+  done
+done

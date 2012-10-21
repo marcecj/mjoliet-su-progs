@@ -1,0 +1,50 @@
+#!/bin/sh
+
+# A simple script that sets up iptables NAT *correctly*.
+iptables -F
+iptables -t nat -F
+
+# Setup default policies to handle unmatched traffic
+iptables -P INPUT ACCEPT
+iptables -P OUTPUT ACCEPT
+iptables -P FORWARD DROP
+
+export WAN=eth0
+export BRIDGE=br0
+# export PACBOOK=172.22.4.90
+export PACBOOK=pacbook.hunte.us
+export PACCENTRE=paccentre.hunte.us
+
+# Then we lock our services so they only work from the LAN
+iptables -I INPUT 1 -i ${BRIDGE} -j ACCEPT
+iptables -I INPUT 1 -i lo -j ACCEPT
+iptables -A INPUT -p UDP --dport bootps -i ${WAN} -j REJECT
+iptables -A INPUT -p UDP --dport domain -i ${WAN} -j REJECT
+
+# Allow access to our ssh server from the WAN
+iptables -A INPUT -p TCP --dport ssh -i ${WAN} -j ACCEPT
+
+# Allow acces to my Samba server (which is restricted to a small set of users)
+iptables -A INPUT -p TCP --dport netbios-ssn -i ${WAN} -s ${PACCENTRE} -j ACCEPT
+iptables -A INPUT -p TCP --dport microsoft-ds -i ${WAN} -s ${PACBOOK} -j ACCEPT
+iptables -A INPUT -p TCP --dport microsoft-ds -i ${WAN} -s ${PACCENTRE} -j ACCEPT
+
+# Allow NTP clients to work
+iptables -A INPUT -p UDP --dport ntp -j ACCEPT
+iptables -A OUTPUT -p UDP --sport ntp -j ACCEPT
+
+# Drop TCP / UDP packets to privileged ports
+iptables -A INPUT -p TCP -i ${WAN} -d 0/0 --dport 0:1023 -j DROP
+iptables -A INPUT -p UDP -i ${WAN} -d 0/0 --dport 0:1023 -j DROP
+
+# Quake/Xonotic/etc. need this port forwarded for LAN play
+iptables -A FORWARD -i ${BRIDGE} -p TCP --dport 26000 -j ACCEPT
+iptables -A FORWARD -i ${WAN} -p TCP --dport 26000 -j ACCEPT
+iptables -A FORWARD -i ${BRIDGE} -p UDP --dport 26000 -j ACCEPT
+iptables -A FORWARD -i ${WAN} -p UDP --dport 26000 -j ACCEPT
+
+# Finally we add the rules for NAT
+# iptables -I FORWARD -i ${BRIDGE} -d 172.16.0.0/255.255.255.0 -j DROP
+iptables -A FORWARD -i ${BRIDGE} -s 172.16.0.0/255.255.255.0 -j ACCEPT
+iptables -A FORWARD -i ${WAN} -d 172.16.0.0/255.255.255.0 -j ACCEPT
+iptables -t nat -A POSTROUTING -o ${WAN} -j SNAT --to-source 172.22.9.90

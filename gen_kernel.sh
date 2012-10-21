@@ -1,0 +1,32 @@
+#!/usr/bin/env sh
+
+mount /boot
+echo
+
+# genkernel method
+# genkernel --lvm --symlink --install all
+
+# manual method
+if [ "${PWD%%-*}" = "/usr/src/linux" ]; then
+  v=$(grep "VERSION =" Makefile | head -n1 | cut -d\  -f3)
+  p=$(grep "PATCHLEVEL =" Makefile | head -n1 | cut -d\  -f3)
+  s=$(grep "SUBLEVEL =" Makefile | head -n1 | cut -d\  -f3)
+  e=$(grep "EXTRAVERSION =" Makefile | head -n1 | cut -d\  -f3)
+  cur_ver=$v.$p.$s$e
+  kern_path="/boot/kernel-$cur_ver"
+  kern_count=$(ls -1 $kern_path* | wc -l)
+  if [ $kern_count -gt 0 ]; then
+      kern_path="$kern_path-c$kern_count"
+  fi
+
+  echo "Making linux-$cur_ver"
+  make -j3 && make -j3 modules_install
+  # make && make modules_install
+
+  cp arch/x86_64/boot/bzImage $kern_path
+  cp System.map /boot/System.map-$cur_ver
+else
+  echo "Not in a linux src directory: ${PWD}!\n"
+fi
+
+echo "\nNow you need to configure grub and unmount /boot/!"
