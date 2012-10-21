@@ -105,14 +105,14 @@ pkg_str = \
 #   - a "base" vesion plus zero or more letters
 #   - a version "appendix" (e.g., pre*, p*, rc*)
 #   - the ebuild revision
-# ver_str = \
-# "(?<!\(|\[)([0-9.]+[a-z]*\
-# (?:[_-]?[a-z]*[0-9]+[a-z]*)?\
-# (?:-r[0-9]+)?)(?!\)|\])"
+ver_str = \
+"(?<!\(|\[)([0-9.]+[a-z]*\
+(?:[_-]?[a-z]*[0-9]+[a-z]*)?\
+(?:-r[0-9]+)?)(?!\)|\])"
 
 # pk_reg = re.compile(pkg_str + "(?:-)?" + ver_str)
 pk_reg = re.compile(pkg_str)
-# ver_reg = re.compile(ver_str)
+ver_reg = re.compile(ver_str)
 
 # reg.findall() also returns empty matches, so filter those with a len() check
 packages = [m for l in lines for m in pk_reg.findall(l) if len(m)>0]
@@ -135,8 +135,6 @@ for p in packages:
     ins_ver   = unique([m for m in ver_reg.findall(installed) if len(m)>0])
     av_ver    = unique([m for m in ver_reg.findall(available) if len(m)>0])
 
-    if "renpy" in p:
-        print(installed, available, ins_ver, av_ver, sep="\-n")
 
     if ins_ver:
         # cur_ver = [v for v in av_ver if version_is_larger(v, ins_ver[0])]
