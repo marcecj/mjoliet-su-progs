@@ -11,6 +11,7 @@ def unique(l):
             l_e.remove(e)
     return l_e
 
+# read the raw lines from the package.accept_keywords file(s)
 fname = "/etc/portage/package.accept_keywords"
 if os.path.isfile(fname):
     with open(fname) as pk:
@@ -33,13 +34,13 @@ pkg_str = \
 [><=~]?\
 (\w+(?:-\w+)?/\w+(?:-[a-zA-Z]+\w*)*){1}"
 
-# pk_reg = re.compile(pkg_str + "(?:-)?" + ver_str)
 pk_reg = re.compile(pkg_str)
 
 # reg.findall() also returns empty matches, so filter those with a len() check
 packages = [m for l in lines for m in pk_reg.findall(l) if len(m)>0]
 packages = unique(packages)
 
+# generate a format string for printing
 max_p_len = max([len(p) for p in packages])
 form_spec = "{0:>" + str(max_p_len) + "}: {1:>12} -> {2:<12}"
 
@@ -54,28 +55,22 @@ for p in packages:
     ins_ver   = unique(['-'.join(portage.pkgsplit(m)[1:]) for m in installed])
 
     if ins_ver:
-        # cur_ver = [v for v in av_ver if version_is_larger(v, ins_ver[0])]
         try:
-            idx     = av_ver.index(ins_ver[0])
+            idx = av_ver.index(ins_ver[0])
         except ValueError:
             idx = -1
             ins_ver = ["*" + v for v in ins_ver]
             
-        # TODO: handle slots properly
-        # cur_ver = (av_ver[idx+1:] if idx+1<len(av_ver) and ins_ver[0] not in av_ver[idx+1:] else [])
+        # TODO: handle slots explicitly?
+        # list all versions higher than the oldest installed version
         cur_ver = [v for v in av_ver[idx+1:] if ins_ver[0] != v]
-        # print(av_ver[idx+1:])
-        # print(p, ins_ver, cur_ver)
         
-        # skip the package if the only upgrade is a live ebuild
-        if len(cur_ver) == 1 and cur_ver[0].startswith('9999'):
+        # TODO: add command line option to filter out live ebuilds
+        # skip the package if the only upgrades are live ebuilds
+        if all(['9999' in cv for cv in cur_ver]):
             continue
 
-        # the additional "and" is necessary in case the version is available
-        # from multiple sources
-        # if len(cur_ver)>0 and ins_ver[0] not in cur_ver:
-        if len(cur_ver)>0:
+        if cur_ver:
             print(form_spec.format(p, ', '.join(ins_ver), ', '.join(cur_ver)))
     else:
-        if len(av_ver)>0:
-            print(form_spec.format(p, '(none)', ', '.join(av_ver)))
+        print(form_spec.format(p, '(none)', ', '.join(av_ver)))
