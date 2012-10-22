@@ -14,6 +14,27 @@ def unique(l):
     from itertools import groupby
     return [a for a,b in groupby(l)]
 
+def get_pkgs_from_package_ak(fname="/etc/portage/package.accept_keywords"):
+    "read the raw lines from the package.accept_keywords file(s)"
+
+    if os.path.isfile(fname):
+        with open(fname) as pk:
+            lines = pk.readlines()
+    elif os.path.isdir(fname):
+        lines = []
+        for root, dirs, files in os.walk(fname):
+            files = [os.path.join(root, f) for f in files if not f.endswith('~')]
+            for f in files:
+                with open(f) as fp:
+                    lines += fp.readlines()
+
+    # find all uncommented, non-empty lines and extract the unique cat/pkg-names
+    pk_reg = re.compile("^\s*(?!#)\s*(.*)")
+    atoms  = [m for l in lines for m in pk_reg.findall(l) if m]
+    atoms  = unique([dep_getkey(a) for a in atoms])
+
+    return atoms
+
 def get_upgrade_paths(packages, installed_pkgs):
     "Find available upgrade paths."
 
@@ -49,23 +70,7 @@ def get_upgrade_paths(packages, installed_pkgs):
 
     return upgrades
 
-# read the raw lines from the package.accept_keywords file(s)
-fname = "/etc/portage/package.accept_keywords"
-if os.path.isfile(fname):
-    with open(fname) as pk:
-        lines = pk.readlines()
-elif os.path.isdir(fname):
-    lines = []
-    for root, dirs, files in os.walk(fname):
-        files = [os.path.join(root, f) for f in files if not f.endswith('~')]
-        for f in files:
-            with open(f) as fp:
-                lines += fp.readlines()
-
-# find all uncommented, non-empty lines and extract the unique cat/pkg-names
-pk_reg   = re.compile("^\s*(?!#)\s*(.*)")
-packages = [m for l in lines for m in pk_reg.findall(l) if m]
-packages = unique([dep_getkey(p) for p in packages])
+packages = get_pkgs_from_package_ak()
 
 # get a list of all installed packages; NOTE: add the cat/pkg string to *very*
 # noticeably reduce overhead in the below for-loop
