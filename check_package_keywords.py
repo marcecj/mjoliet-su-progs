@@ -95,6 +95,9 @@ if __name__ == "__main__":
     upgrades = get_upgrade_paths(packages, installed_pkgs,
                                  skiplive=args.skiplive)
 
+    if not upgrades:
+        exit("No upgrade paths!")
+
     # generate a format string for printing
     max_len = tuple(len(max(l, key=len)) for l in zip(*upgrades))
     form_spec = "{0:>%i}: {1:>%i} -> {2:<%i}" % max_len
