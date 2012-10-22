@@ -3,7 +3,7 @@
 import os
 import re
 from portage import portdb, dep_getkey, vartree
-from portage.versions import cpv_getversion
+from portage.versions import cpv_getkey, cpv_getversion
 
 def unique(l):
     "Remove redundant entries from a list"
@@ -33,13 +33,14 @@ packages = [dep_getkey(p) for p in unique(packages)]
 max_p_len = max([len(p) for p in packages])
 form_spec = "{0:>" + str(max_p_len) + "}: {1:>12} -> {2:<12}"
 
-# get a list of all installed packages
+# get a list of all installed packages; NOTE: add the cat/pkg string to *very*
+# noticeably reduce overhead in the below for-loop
 var_tree = vartree()
-installed_pkgs = var_tree.getallcpv()
+installed_pkgs = [(p,cpv_getkey(p)) for p in var_tree.dbapi.cpv_all()]
 
 for p in packages:
     available = portdb.cp_list(p)
-    installed = [b for b in available if b in installed_pkgs]
+    installed = [ip_v for ip_v,ip in installed_pkgs if p == ip]
     av_ver    = [cpv_getversion(m) for m in available]
     ins_ver   = [cpv_getversion(m) for m in installed]
 
