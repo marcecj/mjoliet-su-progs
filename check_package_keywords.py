@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+# TODO: handle slots explicitly?
+# TODO: add command line option to filter out live ebuilds
+
 import os
 import re
 from portage import portdb, dep_getkey, vartree
@@ -51,11 +54,9 @@ for p in packages:
             idx = -1
             ins_ver = ["*" + v for v in ins_ver]
             
-        # TODO: handle slots explicitly?
         # list all versions higher than the oldest installed version
         cur_ver = [v for v in av_ver[idx+1:] if ins_ver[0] != v]
         
-        # TODO: add command line option to filter out live ebuilds
         # skip the package if the only upgrades are live ebuilds
         if all(['9999' in cv for cv in cur_ver]):
             continue
