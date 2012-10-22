@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 # TODO: handle slots explicitly?
-# TODO: add command line option to filter out live ebuilds
 
 import os
 import re
@@ -35,7 +34,7 @@ def get_pkgs_from_package_ak(fname="/etc/portage/package.accept_keywords"):
 
     return atoms
 
-def get_upgrade_paths(packages, installed_pkgs):
+def get_upgrade_paths(packages, installed_pkgs, skiplive=True):
     "Find available upgrade paths."
 
     upgrades = []
@@ -59,9 +58,9 @@ def get_upgrade_paths(packages, installed_pkgs):
             # list all versions higher than the oldest installed version
             cur_ver = [v for v in av_ver[idx+1:] if ins_ver[0] != v]
             
-            # skip the package if the only upgrades are live ebuilds
-            if all(['9999' in cv for cv in cur_ver]):
-                continue
+            if skiplive:
+                # skip live upgrades
+                cur_ver = [cv for cv in cur_ver if '9999' not in cv]
 
             if cur_ver:
                 upgrades.append((p, ', '.join(ins_ver), ', '.join(cur_ver)))
@@ -71,6 +70,21 @@ def get_upgrade_paths(packages, installed_pkgs):
     return upgrades
 
 if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description="Find upgrades for unmasked packages."
+    )
+
+    parser.add_argument(
+        "--no-skip-live",
+        dest="skiplive",
+        action="store_false",
+        help="Do not skip live updates in the output."
+    )
+
+    args = parser.parse_args()
+
     packages = get_pkgs_from_package_ak()
 
     # get a list of all installed packages; NOTE: add the cat/pkg string to *very*
@@ -78,7 +92,8 @@ if __name__ == "__main__":
     var_tree = vartree()
     installed_pkgs = [(p,cpv_getkey(p)) for p in var_tree.dbapi.cpv_all()]
 
-    upgrades = get_upgrade_paths(packages, installed_pkgs)
+    upgrades = get_upgrade_paths(packages, installed_pkgs,
+                                 skiplive=args.skiplive)
 
     # generate a format string for printing
     max_len = tuple(len(max(l, key=len)) for l in zip(*upgrades))
