@@ -30,7 +30,7 @@ elif os.path.isdir(fname):
 # find all uncommented, non-empty lines and extract the unique cat/pkg-names
 pk_reg   = re.compile("^\s*(?!#)\s*(.*)")
 packages = [m for l in lines for m in pk_reg.findall(l) if m]
-packages = [dep_getkey(p) for p in unique(packages)]
+packages = unique([dep_getkey(p) for p in packages])
 
 # generate a format string for printing
 max_p_len = max([len(p) for p in packages])
