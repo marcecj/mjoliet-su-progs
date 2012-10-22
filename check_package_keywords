@@ -7,12 +7,6 @@ import re
 from portage import portdb, dep_getkey, vartree
 from portage.versions import cpv_getkey, cpv_getversion
 
-def unique(l):
-    "Remove redundant entries from a list"
-
-    from itertools import groupby
-    return [a for a,b in groupby(l)]
-
 def get_pkgs_from_package_ak(fname="/etc/portage/package.accept_keywords"):
     "read the raw lines from the package.accept_keywords file(s)"
 
@@ -30,7 +24,7 @@ def get_pkgs_from_package_ak(fname="/etc/portage/package.accept_keywords"):
     # find all uncommented, non-empty lines and extract the unique cat/pkg-names
     pk_reg = re.compile("^\s*(?!#)\s*(.*)")
     atoms  = [m for l in lines for m in pk_reg.findall(l) if m]
-    atoms  = unique([dep_getkey(a) for a in atoms])
+    atoms  = set(dep_getkey(a) for a in atoms)
 
     return atoms
 
