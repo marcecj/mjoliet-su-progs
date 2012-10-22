@@ -67,10 +67,6 @@ pk_reg   = re.compile("^\s*(?!#)\s*(.*)")
 packages = [m for l in lines for m in pk_reg.findall(l) if m]
 packages = unique([dep_getkey(p) for p in packages])
 
-# generate a format string for printing
-max_p_len = max([len(p) for p in packages])
-form_spec = "{0:>" + str(max_p_len) + "}: {1:>12} -> {2:<12}"
-
 # get a list of all installed packages; NOTE: add the cat/pkg string to *very*
 # noticeably reduce overhead in the below for-loop
 var_tree = vartree()
@@ -78,5 +74,12 @@ installed_pkgs = [(p,cpv_getkey(p)) for p in var_tree.dbapi.cpv_all()]
 
 upgrades = get_upgrade_paths(packages, installed_pkgs)
 
+# generate a format string for printing
+max_len = tuple(len(max(l, key=len)) for l in zip(*upgrades))
+form_spec = "{0:>%i}: {1:>%i} -> {2:<%i}" % max_len
+
+# print the upgrade paths
+header = form_spec.format("Name", "Installed", "Available")
+print(header, "-"*len(header), sep="\n")
 for p in upgrades:
     print(form_spec.format(*p))
