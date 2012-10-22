@@ -70,21 +70,22 @@ def get_upgrade_paths(packages, installed_pkgs):
 
     return upgrades
 
-packages = get_pkgs_from_package_ak()
+if __name__ == "__main__":
+    packages = get_pkgs_from_package_ak()
 
-# get a list of all installed packages; NOTE: add the cat/pkg string to *very*
-# noticeably reduce overhead in the below for-loop
-var_tree = vartree()
-installed_pkgs = [(p,cpv_getkey(p)) for p in var_tree.dbapi.cpv_all()]
+    # get a list of all installed packages; NOTE: add the cat/pkg string to *very*
+    # noticeably reduce overhead in the below for-loop
+    var_tree = vartree()
+    installed_pkgs = [(p,cpv_getkey(p)) for p in var_tree.dbapi.cpv_all()]
 
-upgrades = get_upgrade_paths(packages, installed_pkgs)
+    upgrades = get_upgrade_paths(packages, installed_pkgs)
 
-# generate a format string for printing
-max_len = tuple(len(max(l, key=len)) for l in zip(*upgrades))
-form_spec = "{0:>%i}: {1:>%i} -> {2:<%i}" % max_len
+    # generate a format string for printing
+    max_len = tuple(len(max(l, key=len)) for l in zip(*upgrades))
+    form_spec = "{0:>%i}: {1:>%i} -> {2:<%i}" % max_len
 
-# print the upgrade paths
-header = form_spec.format("Name", "Installed", "Available")
-print(header, "-"*len(header), sep="\n")
-for p in upgrades:
-    print(form_spec.format(*p))
+    # print the upgrade paths
+    header = form_spec.format("Name", "Installed", "Available")
+    print(header, "-"*len(header), sep="\n")
+    for p in upgrades:
+        print(form_spec.format(*p))
