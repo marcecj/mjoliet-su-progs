@@ -48,12 +48,16 @@ for p in packages:
     ins_ver   = [cpv_getversion(m) for m in installed]
 
     if ins_ver:
-        try:
-            idx = av_ver.index(ins_ver[0])
-        except ValueError:
-            idx = -1
-            ins_ver = ["*" + v for v in ins_ver]
-            
+        # find the first installed version in the tree
+        idx = -1
+        for i,v in enumerate(ins_ver):
+            try:
+                idx = av_ver.index(v)
+                break
+            except ValueError:
+                # prefix unavailable versions with a '*'
+                ins_ver[i] = "*" + ins_ver[i]
+
         # list all versions higher than the oldest installed version
         cur_ver = [v for v in av_ver[idx+1:] if ins_ver[0] != v]
         
