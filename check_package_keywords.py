@@ -14,6 +14,41 @@ def unique(l):
     from itertools import groupby
     return [a for a,b in groupby(l)]
 
+def get_upgrade_paths(packages, installed_pkgs):
+    "Find available upgrade paths."
+
+    upgrades = []
+    for p in packages:
+        available = portdb.cp_list(p)
+        installed = [ip_v for ip_v,ip in installed_pkgs if p == ip]
+        av_ver    = [cpv_getversion(m) for m in available]
+        ins_ver   = [cpv_getversion(m) for m in installed]
+
+        if ins_ver:
+            # find the first installed version in the tree
+            idx = -1
+            for i,v in enumerate(ins_ver):
+                try:
+                    idx = av_ver.index(v)
+                    break
+                except ValueError:
+                    # prefix unavailable versions with a '*'
+                    ins_ver[i] = "*" + ins_ver[i]
+
+            # list all versions higher than the oldest installed version
+            cur_ver = [v for v in av_ver[idx+1:] if ins_ver[0] != v]
+            
+            # skip the package if the only upgrades are live ebuilds
+            if all(['9999' in cv for cv in cur_ver]):
+                continue
+
+            if cur_ver:
+                upgrades.append((p, ', '.join(ins_ver), ', '.join(cur_ver)))
+        else:
+            upgrades.append((p, '(none)', ', '.join(av_ver)))
+
+    return upgrades
+
 # read the raw lines from the package.accept_keywords file(s)
 fname = "/etc/portage/package.accept_keywords"
 if os.path.isfile(fname):
@@ -41,31 +76,7 @@ form_spec = "{0:>" + str(max_p_len) + "}: {1:>12} -> {2:<12}"
 var_tree = vartree()
 installed_pkgs = [(p,cpv_getkey(p)) for p in var_tree.dbapi.cpv_all()]
 
-for p in packages:
-    available = portdb.cp_list(p)
-    installed = [ip_v for ip_v,ip in installed_pkgs if p == ip]
-    av_ver    = [cpv_getversion(m) for m in available]
-    ins_ver   = [cpv_getversion(m) for m in installed]
+upgrades = get_upgrade_paths(packages, installed_pkgs)
 
-    if ins_ver:
-        # find the first installed version in the tree
-        idx = -1
-        for i,v in enumerate(ins_ver):
-            try:
-                idx = av_ver.index(v)
-                break
-            except ValueError:
-                # prefix unavailable versions with a '*'
-                ins_ver[i] = "*" + ins_ver[i]
-
-        # list all versions higher than the oldest installed version
-        cur_ver = [v for v in av_ver[idx+1:] if ins_ver[0] != v]
-        
-        # skip the package if the only upgrades are live ebuilds
-        if all(['9999' in cv for cv in cur_ver]):
-            continue
-
-        if cur_ver:
-            print(form_spec.format(p, ', '.join(ins_ver), ', '.join(cur_ver)))
-    else:
-        print(form_spec.format(p, '(none)', ', '.join(av_ver)))
+for p in upgrades:
+    print(form_spec.format(*p))
