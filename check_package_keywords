@@ -21,9 +21,10 @@ def get_pkgs_from_package_ak(fname="/etc/portage/package.accept_keywords"):
                 with open(f) as fp:
                     lines += fp.readlines()
 
-    # find all uncommented, non-empty lines and extract the unique cat/pkg-names
+    # find all uncommented, non-empty lines and extract the unique
+    # cat/pkg-names; remove any repository specification
     pk_reg = re.compile("^\s*(?!#)\s*(.*)")
-    atoms  = [m for l in lines for m in pk_reg.findall(l) if m]
+    atoms  = [m.partition(':')[0] for l in lines for m in pk_reg.findall(l) if m]
     atoms  = sorted(set(dep_getkey(a) for a in atoms))
 
     return atoms
