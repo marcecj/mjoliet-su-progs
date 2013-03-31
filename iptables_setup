@@ -9,7 +9,7 @@ iptables -P INPUT ACCEPT
 iptables -P OUTPUT ACCEPT
 iptables -P FORWARD DROP
 
-export WAN=eth0
+export WAN=wan0
 export BRIDGE=br0
 # export PACBOOK=172.22.4.90
 export PACBOOK=pacbook.hunte.us
