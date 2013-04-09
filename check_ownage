@@ -4,8 +4,7 @@
 TMPFILE_1=$(/bin/mktemp -t vim.$$.XXXXXXXX) || ( echo "Can't use file name. Exiting." && exit 1 )
 TMPFILE_2=$(/bin/mktemp -t vim.$$.XXXXXXXX) || ( echo "Can't use file name. Exiting." && exit 1 )
 
-# checks if two directories were given
-# if not, present usage description
+# checks if two directories were given; if not, present usage description
 [[ ! -d $1 || ! -d $2 ]] && {
   echo -e "Compares the contents of two directories recursively according to:\n"
   echo -e "\t- acces privileges\n\t- owner\n\t- group\n"
@@ -13,7 +12,7 @@ TMPFILE_2=$(/bin/mktemp -t vim.$$.XXXXXXXX) || ( echo "Can't use file name. Exit
   WILL_RUN=0
 }
 
-# if $WILL_RUN is not set to zero, compare the directory hierarchies
+# compare the directory hierarchies if the sanity check above succeeded
 if [[ $WILL_RUN != 0 ]]; then
 
   ls -lR $1 | awk '{print $1"\t"$3"\t"$4"\t"$9}' > $TMPFILE_1;
@@ -24,5 +23,5 @@ if [[ $WILL_RUN != 0 ]]; then
 
 fi
 
-# delete the temporary files files after use afterwards
+# delete the temporary files files after use
 rm $TMPFILE_1 $TMPFILE_2
