@@ -32,8 +32,12 @@ def get_pkgs_from_package_ak(fname="/etc/portage/package.accept_keywords"):
 
     return atoms
 
-def get_upgrade_paths(packages, installed_pkgs, skiplive=True, skipmasked=True):
+def get_upgrade_paths(packages, skiplive=True, skipmasked=True):
     "Find available upgrade paths."
+
+    # get a list of all installed packages; NOTE: add the cat/pkg string to *very*
+    # noticeably reduce overhead in the below for-loop
+    installed_pkgs = [(p,cpv_getkey(p)) for p in vardbapi.cpv_all()]
 
     upgrades = []
     for p in packages:
@@ -100,11 +104,7 @@ if __name__ == "__main__":
 
     packages = get_pkgs_from_package_ak()
 
-    # get a list of all installed packages; NOTE: add the cat/pkg string to *very*
-    # noticeably reduce overhead in the below for-loop
-    installed_pkgs = [(p,cpv_getkey(p)) for p in vardbapi.cpv_all()]
-
-    upgrades = get_upgrade_paths(packages, installed_pkgs,
+    upgrades = get_upgrade_paths(packages,
                                  skiplive=args.skiplive,
                                  skipmasked=args.skipmasked)
 
