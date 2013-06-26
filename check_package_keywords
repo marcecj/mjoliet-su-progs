@@ -102,11 +102,9 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    packages = get_pkgs_from_package_ak()
-
-    upgrades = get_upgrade_paths(packages,
-                                 skiplive=args.skiplive,
-                                 skipmasked=args.skipmasked)
+    upgrades = get_upgrade_paths(packages   = get_pkgs_from_package_ak(),
+                                 skiplive   = args.skiplive,
+                                 skipmasked = args.skipmasked)
 
     if not upgrades:
         exit("No upgrade paths!")
