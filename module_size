@@ -15,7 +15,7 @@ do
     NEW_MOD=$(find $MODULES_PATH -iname $MOD)
     # Sometimes a module name will contain underscores instead of dashes. This
     # accommodates for those cases.
-    if [ ! -n "$NEW_MOD" ];
+    if [ -z "$NEW_MOD" ];
     then 
 	NEW_MOD=$(find $MODULES_PATH -iname $(echo "$MOD" | tr _ -))
     fi
