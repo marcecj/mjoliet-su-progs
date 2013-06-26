@@ -4,8 +4,11 @@
 
 import os
 import re
-from portage import portdb, dep_getkey, vartree, getmaskingstatus
+from portage import db as port_db, root as port_root, dep_getkey, getmaskingstatus
 from portage.versions import cpv_getkey, cpv_getversion
+
+portdbapi = port_db[port_root]['porttree'].dbapi
+vardbapi  = port_db[port_root]['vartree'].dbapi
 
 def get_pkgs_from_package_ak(fname="/etc/portage/package.accept_keywords"):
     "read the raw lines from the package.accept_keywords file(s)"
@@ -34,7 +37,7 @@ def get_upgrade_paths(packages, installed_pkgs, skiplive=True, skipmasked=True):
 
     upgrades = []
     for p in packages:
-        available = portdb.cp_list(p)
+        available = portdbapi.cp_list(p)
         installed = [ip_v for ip_v,ip in installed_pkgs if p == ip]
         av_ver    = [cpv_getversion(m) for m in available]
         ins_ver   = [cpv_getversion(m) for m in installed]
@@ -99,8 +102,7 @@ if __name__ == "__main__":
 
     # get a list of all installed packages; NOTE: add the cat/pkg string to *very*
     # noticeably reduce overhead in the below for-loop
-    var_tree = vartree()
-    installed_pkgs = [(p,cpv_getkey(p)) for p in var_tree.dbapi.cpv_all()]
+    installed_pkgs = [(p,cpv_getkey(p)) for p in vardbapi.cpv_all()]
 
     upgrades = get_upgrade_paths(packages, installed_pkgs,
                                  skiplive=args.skiplive,
