@@ -1,8 +1,5 @@
 #!/bin/sh
 
-mount /boot
-echo
-
 if [ "${PWD%%-*}" != "/usr/src/linux" ]
 then
     echo "Not in a linux src directory: ${PWD}!\n"
@@ -26,4 +23,4 @@ make -j3 && make -j3 modules_install
 cp arch/x86_64/boot/bzImage $kern_path
 cp System.map /boot/System.map-$cur_ver
 
-echo "\nNow you need to configure grub and unmount /boot/!"
+echo "\nNow you need to configure grub!"
