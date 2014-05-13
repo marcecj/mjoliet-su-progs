@@ -17,11 +17,7 @@ then
 fi
 
 # construct the kernel version string
-v=$(grep "VERSION =" Makefile | head -n1 | cut -d\  -f3)
-p=$(grep "PATCHLEVEL =" Makefile | head -n1 | cut -d\  -f3)
-s=$(grep "SUBLEVEL =" Makefile | head -n1 | cut -d\  -f3)
-e=$(grep "EXTRAVERSION =" Makefile | head -n1 | cut -d\  -f3)
-cur_ver=$v.$p.$s$e
+cur_ver="$(make kernelversion)"
 
 # the path to which the kernel will be installed
 kern_path="/boot/kernel-$cur_ver"
