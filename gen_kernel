@@ -24,7 +24,7 @@ kern_path="/boot/kernel-$cur_ver"
 
 # if there is already a kernel with the same version, append a count to the file
 # name to make it unique
-kern_count=$(ls -1 $kern_path* 2>/dev/null| wc -l)
+kern_count=$(ls -1 "$kern_path"* 2>/dev/null| wc -l)
 if [ $kern_count -gt 0 ]; then
     kern_path="$kern_path-c$kern_count"
 fi
@@ -37,7 +37,7 @@ echo "Making linux-$cur_ver"
 kern_image="$(make image_name)"
 make -j$make_j &&
     make -j$make_j modules_install &&
-    cp $kern_image $kern_path &&
+    cp "$kern_image" "$kern_path" &&
     cp System.map /boot/System.map-$cur_ver &&
     cp .config /etc/kernels/kernel-config-$cur_ver &&
     grub2-mkconfig -o /boot/grub/grub.cfg
