@@ -34,9 +34,10 @@ echo "Making linux-$cur_ver"
 # 1.) compile the kernel, its modules, and the System.map file to /boot
 # 2.) copy the kernel configuration file to /etc/kernel/ (like genkernel does)
 # 3.) configure the boot loader
+kern_image="$(make image_name)"
 make -j$make_j &&
     make -j$make_j modules_install &&
-    cp arch/x86_64/boot/bzImage $kern_path &&
+    cp $kern_image $kern_path &&
     cp System.map /boot/System.map-$cur_ver &&
     cp .config /etc/kernels/kernel-config-$cur_ver &&
     grub2-mkconfig -o /boot/grub/grub.cfg
