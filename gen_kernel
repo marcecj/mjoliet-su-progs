@@ -1,5 +1,14 @@
 #!/bin/sh
 
+make_j="1"
+
+while getopts j: a
+do
+    case $a in
+	j) make_j="$OPTARG";;
+    esac
+done
+
 if [ "${PWD%%-*}" != "/usr/src/linux" ]
 then
     echo "Not in a linux src directory: ${PWD}!\n"
@@ -18,7 +27,7 @@ if [ $kern_count -gt 0 ]; then
 fi
 
 echo "Making linux-$cur_ver"
-make -j3 && make -j3 modules_install
+make -j$make_j && make -j$make_j modules_install
 
 cp arch/x86_64/boot/bzImage $kern_path
 cp System.map /boot/System.map-$cur_ver
