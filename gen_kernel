@@ -30,6 +30,7 @@ echo "Making linux-$cur_ver"
 make -j$make_j &&
     make -j$make_j modules_install &&
     cp arch/x86_64/boot/bzImage $kern_path &&
-    cp System.map /boot/System.map-$cur_ver
+    cp System.map /boot/System.map-$cur_ver &&
+    cp .config /etc/kernels/kernel-config-$cur_ver
 
 echo "\nNow you need to configure grub!"
