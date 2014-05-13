@@ -9,24 +9,35 @@ do
     esac
 done
 
+# fail if we are not in a Linux source directory
 if [ "${PWD%%-*}" != "/usr/src/linux" ]
 then
     echo "Not in a linux src directory: ${PWD}!\n"
     exit 1
 fi
 
+# construct the kernel version string
 v=$(grep "VERSION =" Makefile | head -n1 | cut -d\  -f3)
 p=$(grep "PATCHLEVEL =" Makefile | head -n1 | cut -d\  -f3)
 s=$(grep "SUBLEVEL =" Makefile | head -n1 | cut -d\  -f3)
 e=$(grep "EXTRAVERSION =" Makefile | head -n1 | cut -d\  -f3)
 cur_ver=$v.$p.$s$e
+
+# the path to which the kernel will be installed
 kern_path="/boot/kernel-$cur_ver"
+
+# if there is already a kernel with the same version, append a count to the file
+# name to make it unique
 kern_count=$(ls -1 $kern_path* 2>/dev/null| wc -l)
 if [ $kern_count -gt 0 ]; then
     kern_path="$kern_path-c$kern_count"
 fi
 
 echo "Making linux-$cur_ver"
+
+# 1.) compile the kernel, its modules, and the System.map file to /boot
+# 2.) copy the kernel configuration file to /etc/kernel/ (like genkernel does)
+# 3.) configure the boot loader
 make -j$make_j &&
     make -j$make_j modules_install &&
     cp arch/x86_64/boot/bzImage $kern_path &&
