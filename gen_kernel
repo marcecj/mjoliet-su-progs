@@ -1,7 +1,5 @@
 #!/bin/sh
 
-make_j="1"
-
 while getopts j: a
 do
     case $a in
