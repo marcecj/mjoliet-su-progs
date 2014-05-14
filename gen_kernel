@@ -31,9 +31,10 @@ fi
 
 echo "Making linux-$cur_ver"
 
-# 1.) compile the kernel, its modules, and the System.map file to /boot
-# 2.) copy the kernel configuration file to /etc/kernel/ (like genkernel does)
-# 3.) configure the boot loader
+# 1.) compile the kernel and its modules
+# 2.) install the kernel and the System.map file to /boot
+# 3.) copy the kernel configuration file to /etc/kernel/ (like genkernel does)
+# 4.) configure the boot loader
 kern_image="$(make image_name)"
 make -j$make_j &&
     make -j$make_j modules_install &&
