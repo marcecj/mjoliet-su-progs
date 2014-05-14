@@ -6,6 +6,7 @@ while getopts j: a
 do
     case $a in
 	j) make_j="$OPTARG";;
+	\?) exit 1;;
     esac
 done
 
