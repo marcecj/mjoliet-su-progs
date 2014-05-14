@@ -53,7 +53,7 @@ then
 fi
 
 # 1.) install the kernel and the System.map file to /boot
-# 2.) copy the kernel configuration file to /etc/kernel/ (like genkernel does)
+# 2.) copy the kernel configuration file to /etc/kernels/ (like genkernel does)
 # 3.) configure the boot loader
 kern_image="$(make image_name)"
 cp "$kern_image" "$kern_path" &&
