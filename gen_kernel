@@ -32,14 +32,43 @@ fi
 
 echo "Making linux-$cur_ver"
 
-# 1.) compile the kernel and its modules
-# 2.) install the kernel and the System.map file to /boot
-# 3.) copy the kernel configuration file to /etc/kernel/ (like genkernel does)
-# 4.) configure the boot loader
+# compile the kernel and its modules
+make -j$make_j && make -j$make_j modules_install
+
+# the kernel build system returns 2 when compilation fails
+if [ $? = 2 ]
+then
+    echo "Error compiling the kernel." >&2
+    exit $?
+fi
+
+# If /boot was already mounted, we do not need to mount it, but we also do not
+# want to unmount it later, either.
+grep -q /boot /etc/fstab && grep -q /boot /proc/mounts && should_mount="n" || should_mount="y"
+
+# mount /boot if necessary
+if [ $should_mount = "y" ]
+then
+    mount /boot || exit $?
+fi
+
+# 1.) install the kernel and the System.map file to /boot
+# 2.) copy the kernel configuration file to /etc/kernel/ (like genkernel does)
+# 3.) configure the boot loader
 kern_image="$(make image_name)"
-make -j$make_j &&
-    make -j$make_j modules_install &&
-    cp "$kern_image" "$kern_path" &&
+cp "$kern_image" "$kern_path" &&
     cp System.map /boot/System.map-$cur_ver &&
     cp .config /etc/kernels/kernel-config-$cur_ver &&
     grub2-mkconfig -o /boot/grub/grub.cfg
+
+if [ $? -ne 0 ]
+then
+    echo "Error installing." >&2
+    exit $?
+fi
+
+# unmount /boot if necessary
+if [ $should_mount = "y" ]
+then
+    umount /boot || exit $?
+fi
