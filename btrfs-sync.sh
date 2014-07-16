@@ -21,14 +21,14 @@ tgt="$2"
 host="$(hostname)"
 
 # a temporary snapshot of the source btrfs file system
-tmp_snap_dir="$src/_backup_snap"
+tmp_snap_dir="$src/_backup_snap/"
 # a subvolume on the target that contains backups from the source host
 host_subvol="$tgt/$host"
 # the path to source subvolume on the target
-tgt_snap_dir="$host_subvol/$src/"
+tgt_snap_dir="$(echo $host_subvol/$src | sed s:/$::g)"
 
 # arguments to rsync
-rsync_args="-aAXi --delete --numeric-ids --relative --delete-excluded --one-file-system --inplace --log-file=/var/log/rsync.log"
+rsync_args="-aAXi --delete --numeric-ids --delete-excluded --one-file-system --inplace --log-file=/var/log/rsync.log"
 
 # make sure the host subvolume exists on the target
 if [ ! -d "$host_subvol" ]
