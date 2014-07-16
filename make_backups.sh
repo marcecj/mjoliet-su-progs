@@ -36,7 +36,7 @@ do
     if [ $sync -eq 1 ]
     then
 	echo "Syncing source \"$d\" to \"$TARGET\"." >&2
-	./btrfs-sync.sh "$d" "$TARGET"
+	btrfs-sync.sh "$d" "$TARGET"
 
 	if [ $? -ne 0 ]; then
 	    echo "\tError, continuing with next target." >&2
