@@ -1,4 +1,4 @@
-DIRS="/
+SOURCES="/
 /home
 /home/marcec/VBoxDrives
 /home/marcec/multimedia"
@@ -27,7 +27,7 @@ then
     exit
 fi
 
-echo "$DIRS" | while read d;
+echo "$SOURCES" | while read d;
 do
     if [ ! -d "$d" ]; then
         echo "Non-existent source!"
