@@ -34,7 +34,7 @@ rsync_args="-aAXi --delete --numeric-ids --delete-excluded --one-file-system --i
 if [ ! -d "$host_subvol" ]
 then
     /sbin/btrfs subvolume create "$host_subvol" \
-	|| die 1 "Error creating host subvolume \"$host_subvol\"."
+	|| die 2 "Error creating host subvolume \"$host_subvol\"."
 
     echo "INFO: Created host subvolume \"$host_subvol\"."
 fi
@@ -51,17 +51,17 @@ fi
 if [ ! -d "$tgt_snap_dir" ]
 then
     /sbin/btrfs subvolume create "$tgt_snap_dir" \
-	|| die 2 "Error creating source subvolume \"$tgt_snap_dir\"."
+	|| die 3 "Error creating source subvolume \"$tgt_snap_dir\"."
 
     echo "INFO: Created source subvolume \"$tgt_snap_dir\"."
 fi
 
 # create a read-only temporary snapshot of the source
 /sbin/btrfs subvolume snapshot -r "$src" "$tmp_snap_dir" \
-    || die 3 "Error creating temporary snapshot of \"$src\" at \"$tmp_snap_dir\"."
+    || die 4 "Error creating temporary snapshot of \"$src\" at \"$tmp_snap_dir\"."
 
 /usr/bin/rsync $rsync_args "$tmp_snap_dir" "$tgt_snap_dir" \
-    || die 4 "Error running rsync."
+    || die 5 "Error running rsync."
 
 /sbin/btrfs subvolume delete "$tmp_snap_dir" \
-    || die 5 "Error deleting snapshot directory \"$tmp_snap_dir\"."
+    || die 6 "Error deleting snapshot directory \"$tmp_snap_dir\"."
