@@ -2,7 +2,8 @@ DIRS="/
 /home
 /home/marcec/VBoxDrives
 /home/marcec/multimedia"
-TARGET="/run/media/marcec/MARCEC_BACKUP/"
+BACKUP_DIR="/run/media/marcec/MARCEC_BACKUP"
+TARGET="$BACKUP_DIR/$(hostname)"
 
 sync=0
 while getopts s a;
@@ -44,7 +45,7 @@ do
 	fi
     fi
 
-    target_dir="$(echo ${TARGET}$(hostname)${d} | sed s:/$::g)"
+    target_dir="$(echo ${TARGET}${d} | sed s:/$::g)"
 
     btrfs-snap -r "$target_dir" "$prefix" "$count"
 

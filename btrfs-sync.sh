@@ -18,25 +18,22 @@ fi
 
 src="$1"
 tgt="$2"
-host="$(hostname)"
 
 # a temporary snapshot of the source btrfs file system
 tmp_snap_dir="$src/_backup_snap/"
-# a subvolume on the target that contains backups from the source host
-host_subvol="$tgt/$host"
 # the path to source subvolume on the target
-tgt_snap_dir="$(echo $host_subvol/$src | sed s:/$::g)"
+tgt_snap_dir="$(echo $tgt/$src | sed s:/$::g)"
 
 # arguments to rsync
 rsync_args="-aAXi --delete --numeric-ids --delete-excluded --one-file-system --inplace --log-file=/var/log/rsync.log"
 
 # make sure the host subvolume exists on the target
-if [ ! -d "$host_subvol" ]
+if [ ! -d "$tgt" ]
 then
-    /sbin/btrfs subvolume create "$host_subvol" \
-	|| die 2 "Error creating host subvolume \"$host_subvol\"."
+    /sbin/btrfs subvolume create "$tgt" \
+	|| die 2 "Error creating host subvolume \"$tgt\"."
 
-    echo "INFO: Created host subvolume \"$host_subvol\"."
+    echo "INFO: Created host subvolume \"$tgt\"."
 fi
 
 # Create the parent directory of the source subvolume, because "btrfs
