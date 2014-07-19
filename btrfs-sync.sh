@@ -25,7 +25,7 @@ tmp_snap_dir="$src/_backup_snap/"
 tgt_snap_dir="$(echo $tgt/$src | sed s:/$::g)"
 
 # arguments to rsync
-rsync_args="-aAXi --delete --numeric-ids --delete-excluded --one-file-system --inplace --log-file=/var/log/rsync.log"
+rsync_args="-aAXi --delete --numeric-ids --delete-excluded --one-file-system --inplace --exclude=.snapshot --log-file=/var/log/rsync.log"
 
 # make sure the host subvolume exists on the target
 if [ ! -d "$tgt" ]
