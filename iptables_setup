@@ -22,9 +22,6 @@ iptables -I INPUT 1 -i lo -j ACCEPT
 iptables -A INPUT -p UDP --dport bootps -i ${WAN} -j REJECT
 iptables -A INPUT -p UDP --dport domain -i ${WAN} -j REJECT
 
-# Allow access to our ssh server from the WAN
-iptables -A INPUT -p TCP --dport ssh -i ${WAN} -j ACCEPT
-
 # Allow access to my Samba server (which is restricted to a small set of users)
 iptables -A INPUT -p TCP --dport netbios-ssn -i ${WAN} -s ${PACCENTRE} -j ACCEPT
 iptables -A INPUT -p TCP --dport microsoft-ds -i ${WAN} -s ${PACBOOK} -j ACCEPT
