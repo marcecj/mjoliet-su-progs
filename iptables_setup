@@ -10,7 +10,6 @@ iptables -P OUTPUT ACCEPT
 iptables -P FORWARD DROP
 
 WAN=wan0
-PPP=ppp0
 BRIDGE=br0
 # PACBOOK=172.22.4.90
 PACBOOK=pacbook.hunte.us
@@ -44,6 +43,4 @@ iptables -A FORWARD -i ${WAN} -p UDP --dport 26000 -j ACCEPT
 # Finally we add the rules for NAT
 iptables -A FORWARD -i ${BRIDGE} -s 172.16.0.0/255.255.255.0 -j ACCEPT
 iptables -A FORWARD -i ${WAN} -d 172.16.0.0/255.255.255.0 -j ACCEPT
-iptables -A FORWARD -i ${PPP} -d 172.16.0.0/255.255.255.0 -j ACCEPT
 iptables -t nat -A POSTROUTING -o ${WAN} -j SNAT --to-source 192.168.54.197
-iptables -t nat -A POSTROUTING -o ${PPP} -j MASQUERADE
