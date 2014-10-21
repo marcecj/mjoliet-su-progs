@@ -12,8 +12,8 @@ iptables -P FORWARD DROP
 WAN=wan0
 BRIDGE=br0
 # PACBOOK=172.22.4.90
-PACBOOK=pacbook.hunte.us
-PACCENTRE=paccentre.hunte.us
+PACBOOK=pacbook
+PACCENTRE=paccentre
 
 # Then we lock our services so they only work from the LAN
 iptables -I INPUT 1 -i ${BRIDGE} -j ACCEPT
