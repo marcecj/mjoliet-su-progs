@@ -2,7 +2,7 @@ SOURCES="/
 /home
 /home/marcec/VBoxDrives
 /home/marcec/multimedia"
-BACKUP_DIR="/run/media/marcec/MARCEC_BACKUP"
+BACKUP_DIR="/media/MARCEC_BACKUP"
 TARGET="$BACKUP_DIR/$(hostname)"
 
 sync=0
