@@ -115,7 +115,8 @@ do
         exit 1
     fi
 
-    # make a snapshot of the source volume
+    # make a snapshot of the source volume; we only need to keep two around for
+    # incremental send/receive
     btrfs-snap -r "$d" "$prefix" 2
 
     if [ $? -ne 0 ]; then
@@ -125,7 +126,7 @@ do
 
     tgt="${TARGET}${d}/.snapshot"
 
-    echo "Transferring snapshot '$d' to '$tgt'"
+    echo "Transferring snapshot of '$d' to '$tgt'"
     transfer_subvolume "$d" "$tgt"
 
     if [ $? -ne 0 ]; then
