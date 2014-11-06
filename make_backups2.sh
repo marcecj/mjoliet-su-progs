@@ -72,25 +72,42 @@ transfer_subvolume() {
     fi
 }
 
-non_hourly_backups() {
-    echo "Note implemented yet"
-    return
-
+rotate_prefix() {
     local tgt="$1"
-    local oldest_snapshot=""
+    local old_prefix=""
 
-    if [ "$prefix" = "daily" ]; then
-	oldest_snapshot="$(ls -1 -d --sort=time ${tgt}/hourly* | tail -n1)"
+    if [ "$prefix" = "hourly" ]; then
+	return
+    elif [ "$prefix" = "daily" ]; then
+	old_prefix="hourly"
     elif [ "$prefix" = "weekly" ]; then
-	oldest_snapshot="$(ls -1 -d --sort=time ${tgt}/daily* | tail -n1)"
+	old_prefix="daily"
     elif [ "$prefix" = "monthly" ]; then
-	oldest_snapshot="$(ls -1 -d --sort=time ${tgt}/weekly* | tail -n1)"
+	old_prefix="weekly"
     fi
 
-    btrfs-snap -r -b "$tgt" "$prefix" "$count"
+    local old_snapshot="$(ls -1 -d --sort=time ${tgt}/${old_prefix}* | head -n1)"
+    local new_snapshot=$(echo "$old_snapshot" | sed -e "s:${old_prefix}_\([^/]\+\):${prefix}_\1:g")
 
-    if [ ! -z "$oldest_snapshot" -a "$prefix" = "hourly" ]; then
-	btrfs subvolume delete "$oldest_snapshot"
+    if [ -d "$new_snapshot" ]; then
+	echo "INFO: already made daily snapshot."
+	return
+    fi
+
+    btrfs subvolume snapshot -r "$old_snapshot" "$new_snapshot"
+}
+
+del_oldest_snapshot() {
+    tgt="$1"
+    local num_snapshots="$(ls -1 -d $tgt/${prefix}* | wc -l)"
+    local num_to_delete="$(($num_snapshots - $count))"
+    local oldest_snapshots="$(ls -1 -d --sort=time $tgt/${prefix}* | head -n$num_to_delete)"
+
+    if [ "$num_snapshots" -gt "$count" ]; then
+	echo "INFO: deleting oldest snapshot."
+	echo "$oldest_snapshots" | while read s; do
+	    btrfs subvolume delete "$s"
+	done
     fi
 }
 
@@ -144,7 +161,9 @@ do
 	fi
     fi
 
-    non_hourly_backups "$tgt"
+    rotate_prefix "$tgt"
+
+    del_oldest_snapshot "$tgt"
 
     echo "******"
 done
