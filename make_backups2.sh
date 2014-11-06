@@ -115,30 +115,33 @@ do
         exit 1
     fi
 
-    # make a snapshot of the source volume; we only need to keep two around for
-    # incremental send/receive
-    btrfs-snap -r "$d" "$prefix" 2
-
-    if [ $? -ne 0 ]; then
-	echo "\tError creating snapshot." >&2
-	exit 2
-    fi
-
     tgt="${TARGET}${d}/.snapshot"
 
-    echo "Transferring snapshot of '$d' to '$tgt'"
-    transfer_subvolume "$d" "$tgt"
+    if [ "$prefix" = "hourly" ];
+    then
+	# make a snapshot of the source volume; we only need to keep two around for
+	# incremental send/receive
+	btrfs-snap -r "$d" "$prefix" 2
 
-    if [ $? -ne 0 ]; then
-	echo "\tError transferring, continuing with next target." >&2
+	if [ $? -ne 0 ]; then
+	    echo "\tError creating snapshot." >&2
+	    exit 2
+	fi
 
-	echo "" >&2
-	echo "\tTo prevent breaking the chain of snapshots," >&2
-	echo "\tthe most recent one will be deleted." >&2
+	echo "Transferring snapshot of '$d' to '$tgt'"
+	transfer_subvolume "$d" "$tgt"
 
-	del_current_snapshot "$d"
+	if [ $? -ne 0 ]; then
+	    echo "\tError transferring, continuing with next target." >&2
 
-	continue
+	    echo "" >&2
+	    echo "\tTo prevent breaking the chain of snapshots," >&2
+	    echo "\tthe most recent one will be deleted." >&2
+
+	    del_current_snapshot "$d"
+
+	    continue
+	fi
     fi
 
     non_hourly_backups "$tgt"
