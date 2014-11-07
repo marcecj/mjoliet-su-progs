@@ -13,6 +13,7 @@ init_target_subvolumes() {
     echo "$SOURCES" | while read d;
     do
 	local tgt="${TARGET}/${d}"
+
 	if [ ! -d "$tgt" ]; then
 	    # Create the parent directory of the source subvolume, because "btrfs
 	    # subvolume create" will not create it automatically.
@@ -47,8 +48,7 @@ if [ -z "$prefix" -o -z "$count" ]; then
     exit 1
 fi
 
-if [ ! -d "$TARGET" ];
-then
+if [ ! -d "$TARGET" ]; then
     echo "Non-existent target!"
     exit
 fi
@@ -114,6 +114,7 @@ del_current_snapshot() {
     local src="$1"
     local num_snapshots="$(ls -1 -d $src/.snapshot/${prefix}* | wc -l)"
     local current_snapshot="$(ls -1 -d --sort=time $src/.snapshot/${prefix}* | tail -n1)"
+
     if [ "$num_snapshots" -ge 2 ]; then
 	btrfs subvolume delete "$current_snapshot"
     fi
@@ -144,7 +145,6 @@ do
 
 	if [ $? -ne 0 ]; then
 	    echo "\tError transferring, continuing with next target." >&2
-
 	    echo "" >&2
 	    echo "\tTo prevent breaking the chain of snapshots," >&2
 	    echo "\tthe most recent one will be deleted." >&2
