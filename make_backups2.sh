@@ -59,6 +59,7 @@ fi
 # define helper functions
 #
 
+# transfers the subvolume, incrementally if a parent subvolume exists
 transfer_subvolume() {
     local src="$1"
     local tgt="$2"
@@ -75,6 +76,8 @@ transfer_subvolume() {
     fi
 }
 
+# rotates the oldest snapshot of a prefix to the next prefix (e.g., the oldest
+# hourly snapshot becomes the newest daily snapshot)
 rotate_prefix() {
     local tgt="$1"
     local old_prefix=""
@@ -97,6 +100,7 @@ rotate_prefix() {
     btrfs subvolume snapshot -r "$old_snapshot" "$new_snapshot"
 }
 
+# deletes the oldest snapshot of the selected prefix when necessary
 del_oldest_snapshot() {
     local tgt="$1"
     local num_snapshots="$(ls -1 -d $tgt/${prefix}* | wc -l)"
@@ -111,6 +115,7 @@ del_oldest_snapshot() {
     fi
 }
 
+# deletes the most recently made snapshot (on the *source* subvolume!)
 del_current_snapshot() {
     local src="$1"
     local num_snapshots="$(ls -1 -d $src/.snapshot/${prefix}* | wc -l)"
@@ -120,6 +125,10 @@ del_current_snapshot() {
 	btrfs subvolume delete "$current_snapshot"
     fi
 }
+
+#
+# perform the backup
+#
 
 echo "$SOURCES" | while read d;
 do
