@@ -52,7 +52,7 @@ fi
 
 if [ ! -d "$TARGET" ]; then
     echo "Non-existent target!"
-    exit
+    exit 2
 fi
 
 #
@@ -128,7 +128,7 @@ echo "$SOURCES" | while read d;
 do
     if [ ! -d "$d" ]; then
         echo "Non-existent source!"
-        exit 1
+        exit 3
     fi
 
     tgt="${TARGET}${d}/.snapshot"
@@ -141,7 +141,7 @@ do
 
 	if [ $? -ne 0 ]; then
 	    echo "\tError creating snapshot." >&2
-	    exit 2
+	    exit 4
 	fi
 
 	transfer_subvolume "$d" "$tgt"
