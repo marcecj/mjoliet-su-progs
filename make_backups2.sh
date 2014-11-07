@@ -79,15 +79,12 @@ rotate_prefix() {
     local tgt="$1"
     local old_prefix=""
 
-    if [ "$prefix" = "hourly" ]; then
-	return
-    elif [ "$prefix" = "daily" ]; then
-	old_prefix="hourly"
-    elif [ "$prefix" = "weekly" ]; then
-	old_prefix="daily"
-    elif [ "$prefix" = "monthly" ]; then
-	old_prefix="weekly"
-    fi
+    case "$prefix" in
+	"hourly") return;;
+	"daily") old_prefix="hourly";;
+	"weekly") old_prefix="daily";;
+	"monthly") old_prefix="weekly";;
+    esac
 
     local old_snapshot="$(ls -1 -d --sort=time ${tgt}/${old_prefix}* | head -n1)"
     local new_snapshot=$(echo "$old_snapshot" | sed -e "s:${old_prefix}_\([^/]\+\):${prefix}_\1:g")
