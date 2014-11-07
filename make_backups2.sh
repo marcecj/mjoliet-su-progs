@@ -51,7 +51,7 @@ if [ -z "$prefix" -o -z "$count" ]; then
 fi
 
 if [ ! -d "$TARGET" ]; then
-    echo "Non-existent target!"
+    echo "Non-existent target!" >&2
     exit 2
 fi
 
@@ -133,7 +133,7 @@ del_current_snapshot() {
 echo "$SOURCES" | while read d;
 do
     if [ ! -d "$d" ]; then
-        echo "Non-existent source!"
+        echo "Non-existent source!" >&2
         exit 3
     fi
 
