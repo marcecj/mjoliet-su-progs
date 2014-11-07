@@ -97,7 +97,7 @@ rotate_prefix() {
 }
 
 del_oldest_snapshot() {
-    tgt="$1"
+    local tgt="$1"
     local num_snapshots="$(ls -1 -d $tgt/${prefix}* | wc -l)"
     local num_to_delete="$(($num_snapshots - $count))"
     local oldest_snapshots="$(ls -1 -d --sort=time $tgt/${prefix}* | head -n$num_to_delete)"
@@ -111,7 +111,7 @@ del_oldest_snapshot() {
 }
 
 del_current_snapshot() {
-    src="$1"
+    local src="$1"
     local num_snapshots="$(ls -1 -d $src/.snapshot/${prefix}* | wc -l)"
     local current_snapshot="$(ls -1 -d --sort=time $src/.snapshot/${prefix}* | tail -n1)"
     if [ "$num_snapshots" -ge 2 ]; then
