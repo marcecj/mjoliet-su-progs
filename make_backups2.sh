@@ -10,6 +10,8 @@ TARGET="$BACKUP_DIR/$(hostname)2"
 #
 
 init_target_subvolumes() {
+    echo "LOG: Initialising target subvolumes"
+
     echo "$SOURCES" | while read d;
     do
 	local tgt="${TARGET}/${d}"
@@ -64,6 +66,8 @@ transfer_subvolume() {
     local current_snapshot="$(ls -1 -d --sort=time $src/.snapshot/${prefix}* | tail -n1)"
     local parent_snapshot="$(ls -1 -d --sort=time $src/.snapshot/${prefix}* | tail -n2 | head -n1)"
 
+    echo "LOG: Transferring snapshot of '$src' to '$tgt'"
+
     if [ "$num_snapshots" -ge 2 ]; then
 	btrfs send -p "$parent_snapshot" "$current_snapshot" | btrfs receive "$tgt"
     else
@@ -103,7 +107,7 @@ del_oldest_snapshot() {
     local oldest_snapshots="$(ls -1 -d --sort=time $tgt/${prefix}* | head -n$num_to_delete)"
 
     if [ "$num_snapshots" -gt "$count" ]; then
-	echo "INFO: deleting oldest snapshot."
+	echo "LOG: deleting oldest snapshot."
 	echo "$oldest_snapshots" | while read s; do
 	    btrfs subvolume delete "$s"
 	done
@@ -140,7 +144,6 @@ do
 	    exit 2
 	fi
 
-	echo "Transferring snapshot of '$d' to '$tgt'"
 	transfer_subvolume "$d" "$tgt"
 
 	if [ $? -ne 0 ]; then
