@@ -9,32 +9,6 @@ TARGET="$BACKUP_DIR/$(hostname)2"
 # handle options
 #
 
-init=0
-while getopts i a;
-do
-    case $a in
-        i) init=1;;
-    esac
-done
-shift $(expr $OPTIND - 1)
-
-prefix="$1"
-count="$2"
-if [ -z "$prefix" -o -z "$count" ]; then
-    echo "Missing arguments!" >&2
-    exit 1
-fi
-
-if [ ! -d "$TARGET" ];
-then
-    echo "Non-existent target!"
-    exit
-fi
-
-#
-# define helper functions
-#
-
 init_target_subvolumes() {
     echo "$SOURCES" | while read d;
     do
@@ -57,6 +31,31 @@ init_target_subvolumes() {
 	fi
     done
 }
+
+while getopts i a;
+do
+    case $a in
+        i) init_target_subvolumes; exit;;
+    esac
+done
+shift $(expr $OPTIND - 1)
+
+prefix="$1"
+count="$2"
+if [ -z "$prefix" -o -z "$count" ]; then
+    echo "Missing arguments!" >&2
+    exit 1
+fi
+
+if [ ! -d "$TARGET" ];
+then
+    echo "Non-existent target!"
+    exit
+fi
+
+#
+# define helper functions
+#
 
 transfer_subvolume() {
     local src="$1"
@@ -119,11 +118,6 @@ del_current_snapshot() {
 	btrfs subvolume delete "$current_snapshot"
     fi
 }
-
-if [ "$init" -eq 1 ]; then
-    init_target_subvolumes
-    exit
-fi
 
 echo "$SOURCES" | while read d;
 do
