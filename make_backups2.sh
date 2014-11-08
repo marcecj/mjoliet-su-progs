@@ -1,3 +1,5 @@
+#!/bin/sh
+
 DEFAULT_SOURCES="/
 /home
 /home/marcec/VBoxDrives
