@@ -17,7 +17,7 @@ init_target_subvolumes() {
 
     echo "$SOURCES" | while read d;
     do
-	local tgt="${TARGET}/${d}"
+	local tgt="${TARGET}${d}"
 
 	if [ ! -d "$tgt" ]; then
 	    # Create the parent directory of the source subvolume, because
