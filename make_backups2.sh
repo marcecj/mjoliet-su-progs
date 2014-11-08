@@ -107,6 +107,11 @@ rotate_prefix() {
     local old_snapshot="$($ssh ls -1d ${tgt}/${old_prefix}* | head -n1)"
     local new_snapshot=$(echo "$old_snapshot" | sed -e "s:${old_prefix}_\([^/]\+\):${prefix}_\1:g")
 
+    if $ssh [ -z "$old_snapshot" ]; then
+	echo "INFO: No snapshots to rotate."
+	return
+    fi
+
     if $ssh [ -d "$new_snapshot" ]; then
 	echo "INFO: already made daily snapshot."
 	return
