@@ -13,38 +13,50 @@ TARGET="$BACKUP_DIR/$(hostname)2"
 #
 
 init_target_subvolumes() {
+    local ssh="$1"
+
     echo "LOG: Initialising target subvolumes"
 
     echo "$SOURCES" | while read d;
     do
 	local tgt="${TARGET}${d}"
 
-	if [ ! -d "$tgt" ]; then
+	if $ssh [ ! -d "$tgt" ]; then
 	    # Create the parent directory of the source subvolume, because
 	    # "btrfs subvolume create" will not create it automatically.
 	    local tgt_snap_parent=$(echo "$tgt" | sed -e "s:\(.*\)/\([^/]\+/\?\):\1:g")
-	    if [ ! -d "$tgt_snap_parent" ]; then
-		mkdir -p "$tgt_snap_parent"
+	    if $ssh [ ! -d "$tgt_snap_parent" ]; then
+		$ssh mkdir -p "$tgt_snap_parent"
 		echo "INFO: Created source subvolume parent \"$tgt_snap_parent\"."
 	    fi
 
-	    btrfs subvolume create "$tgt"
+	    $ssh btrfs subvolume create "$tgt"
 	fi
 
-	if [ ! -d "$tgt/.snapshot" ]; then
-	    mkdir "$tgt/.snapshot"
+	if $ssh [ ! -d "$tgt/.snapshot" ]; then
+	    $ssh mkdir "$tgt/.snapshot"
 	    echo "INFO: Created snapshot directory \""$tgt"/.snapshot\"."
 	fi
     done
 }
 
-while getopts i a;
+ssh=""
+ssh_pipe=""
+init=0
+while getopts r:i a;
 do
     case $a in
-        i) init_target_subvolumes; exit;;
+	r) ssh="ssh -n $OPTARG";
+	   ssh_pipe="ssh $OPTARG";;
+        i) init=1;;
     esac
 done
 shift $(expr $OPTIND - 1)
+
+if [ "$init" -eq 1 ]; then
+    init_target_subvolumes "$ssh"
+    exit
+fi
 
 prefix="$1"
 count="$2"
@@ -53,7 +65,7 @@ if [ -z "$prefix" -o -z "$count" ]; then
     exit 1
 fi
 
-if [ ! -d "$TARGET" ]; then
+if $ssh [ ! -d "$TARGET" ]; then
     echo "Non-existent target!" >&2
     exit 2
 fi
@@ -73,9 +85,9 @@ transfer_subvolume() {
     echo "LOG: Transferring snapshot of '$src' to '$tgt'"
 
     if [ "$num_snapshots" -ge 2 ]; then
-	btrfs send -p "$parent_snapshot" "$current_snapshot" | btrfs receive "$tgt"
+	btrfs send -p "$parent_snapshot" "$current_snapshot" | $ssh_pipe btrfs receive "$tgt"
     else
-	btrfs send "$current_snapshot" | btrfs receive "$tgt"
+	btrfs send "$current_snapshot" | $ssh_pipe btrfs receive "$tgt"
     fi
 }
 
@@ -92,28 +104,28 @@ rotate_prefix() {
 	"monthly") old_prefix="weekly";;
     esac
 
-    local old_snapshot="$(ls -1d ${tgt}/${old_prefix}* | head -n1)"
+    local old_snapshot="$($ssh ls -1d ${tgt}/${old_prefix}* | head -n1)"
     local new_snapshot=$(echo "$old_snapshot" | sed -e "s:${old_prefix}_\([^/]\+\):${prefix}_\1:g")
 
-    if [ -d "$new_snapshot" ]; then
+    if $ssh [ -d "$new_snapshot" ]; then
 	echo "INFO: already made daily snapshot."
 	return
     fi
 
-    btrfs subvolume snapshot -r "$old_snapshot" "$new_snapshot"
+    $ssh btrfs subvolume snapshot -r "$old_snapshot" "$new_snapshot"
 }
 
 # deletes the oldest snapshot of the selected prefix when necessary
 del_oldest_snapshot() {
     local tgt="$1"
-    local num_snapshots="$(ls -1d $tgt/${prefix}* | wc -l)"
+    local num_snapshots="$($ssh ls -1d $tgt/${prefix}* | wc -l)"
     local num_to_delete="$(($num_snapshots - $count))"
-    local oldest_snapshots="$(ls -1d $tgt/${prefix}* | head -n$num_to_delete)"
+    local oldest_snapshots="$($ssh ls -1d $tgt/${prefix}* | head -n$num_to_delete)"
 
     if [ "$num_snapshots" -gt "$count" ]; then
 	echo "LOG: deleting oldest snapshot."
 	echo "$oldest_snapshots" | while read s; do
-	    btrfs subvolume delete "$s"
+	    $ssh btrfs subvolume delete "$s"
 	done
     fi
 }
