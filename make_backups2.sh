@@ -63,9 +63,9 @@ fi
 transfer_subvolume() {
     local src="$1"
     local tgt="$2"
-    local num_snapshots="$(ls -1 -d $src/.snapshot/${prefix}* | wc -l)"
-    local current_snapshot="$(ls -1 -d --sort=time $src/.snapshot/${prefix}* | tail -n1)"
-    local parent_snapshot="$(ls -1 -d --sort=time $src/.snapshot/${prefix}* | tail -n2 | head -n1)"
+    local num_snapshots="$(ls -1d $src/.snapshot/${prefix}* | wc -l)"
+    local current_snapshot="$(ls -1d --sort=time $src/.snapshot/${prefix}* | tail -n1)"
+    local parent_snapshot="$(ls -1d --sort=time $src/.snapshot/${prefix}* | tail -n2 | head -n1)"
 
     echo "LOG: Transferring snapshot of '$src' to '$tgt'"
 
@@ -89,7 +89,7 @@ rotate_prefix() {
 	"monthly") old_prefix="weekly";;
     esac
 
-    local old_snapshot="$(ls -1 -d --sort=time ${tgt}/${old_prefix}* | head -n1)"
+    local old_snapshot="$(ls -1d --sort=time ${tgt}/${old_prefix}* | head -n1)"
     local new_snapshot=$(echo "$old_snapshot" | sed -e "s:${old_prefix}_\([^/]\+\):${prefix}_\1:g")
 
     if [ -d "$new_snapshot" ]; then
@@ -103,9 +103,9 @@ rotate_prefix() {
 # deletes the oldest snapshot of the selected prefix when necessary
 del_oldest_snapshot() {
     local tgt="$1"
-    local num_snapshots="$(ls -1 -d $tgt/${prefix}* | wc -l)"
+    local num_snapshots="$(ls -1d $tgt/${prefix}* | wc -l)"
     local num_to_delete="$(($num_snapshots - $count))"
-    local oldest_snapshots="$(ls -1 -d --sort=time $tgt/${prefix}* | head -n$num_to_delete)"
+    local oldest_snapshots="$(ls -1d --sort=time $tgt/${prefix}* | head -n$num_to_delete)"
 
     if [ "$num_snapshots" -gt "$count" ]; then
 	echo "LOG: deleting oldest snapshot."
@@ -118,8 +118,8 @@ del_oldest_snapshot() {
 # deletes the most recently made snapshot (on the *source* subvolume!)
 del_current_snapshot() {
     local src="$1"
-    local num_snapshots="$(ls -1 -d $src/.snapshot/${prefix}* | wc -l)"
-    local current_snapshot="$(ls -1 -d --sort=time $src/.snapshot/${prefix}* | tail -n1)"
+    local num_snapshots="$(ls -1d $src/.snapshot/${prefix}* | wc -l)"
+    local current_snapshot="$(ls -1d --sort=time $src/.snapshot/${prefix}* | tail -n1)"
 
     if [ "$num_snapshots" -ge 2 ]; then
 	btrfs subvolume delete "$current_snapshot"
