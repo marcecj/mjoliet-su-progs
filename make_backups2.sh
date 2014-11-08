@@ -3,7 +3,7 @@ DEFAULT_SOURCES="/
 /home/marcec/VBoxDrives
 /home/marcec/multimedia"
 SOURCES="${SOURCES:-$DEFAULT_SOURCES}"
-BACKUP_DIR="/media/MARCEC_BACKUP"
+BACKUP_DIR="${BACKUP_DIR:-/media/MARCEC_BACKUP}"
 TARGET="$BACKUP_DIR/$(hostname)2"
 
 #
