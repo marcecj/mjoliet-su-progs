@@ -20,8 +20,8 @@ init_target_subvolumes() {
 	local tgt="${TARGET}/${d}"
 
 	if [ ! -d "$tgt" ]; then
-	    # Create the parent directory of the source subvolume, because "btrfs
-	    # subvolume create" will not create it automatically.
+	    # Create the parent directory of the source subvolume, because
+	    # "btrfs subvolume create" will not create it automatically.
 	    local tgt_snap_parent=$(echo "$tgt" | sed -e "s:\(.*\)/\([^/]\+/\?\):\1:g")
 	    if [ ! -d "$tgt_snap_parent" ]; then
 		mkdir -p "$tgt_snap_parent"
@@ -144,8 +144,8 @@ do
 
     if [ "$prefix" = "hourly" ];
     then
-	# make a snapshot of the source volume; we only need to keep two around for
-	# incremental send/receive
+	# make a snapshot of the source volume; we only need to keep two around
+	# for incremental send/receive
 	btrfs-snap -r "$d" "$prefix" 2
 
 	if [ $? -ne 0 ]; then
