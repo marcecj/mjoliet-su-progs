@@ -6,7 +6,7 @@ DEFAULT_SOURCES="/
 /home/marcec/multimedia"
 SOURCES="${SOURCES:-$DEFAULT_SOURCES}"
 BACKUP_DIR="${BACKUP_DIR:-/media/MARCEC_BACKUP}"
-TARGET="$BACKUP_DIR/$(hostname)2"
+TARGET="$BACKUP_DIR/$(hostname)"
 
 #
 # handle options
