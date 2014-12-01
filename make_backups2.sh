@@ -2,7 +2,6 @@
 
 DEFAULT_SOURCES="/
 /home
-/home/marcec/VBoxDrives
 /home/marcec/multimedia"
 SOURCES="${SOURCES:-$DEFAULT_SOURCES}"
 BACKUP_DIR="${BACKUP_DIR:-/media/MARCEC_BACKUP}"
