@@ -61,7 +61,7 @@ def get_upgrade_paths(packages, skiplive=True, skipmasked=True,
 
             # list all versions higher than the oldest installed version
             cur_ver = [v for v in av_ver[idx+1:] if ins_ver[0] != v]
-            
+
             if skiplive:
                 # skip live upgrades
                 cur_ver = [cv for cv in cur_ver if '9999' not in cv]
