@@ -9,38 +9,38 @@ iptables -P INPUT ACCEPT
 iptables -P OUTPUT ACCEPT
 iptables -P FORWARD DROP
 
-WAN=wan0
-BRIDGE=br0
-LAN_IP=192.168.178.0/24
+wan=wan0
+bridge=br0
+lan_ip=192.168.178.0/24
 
 # Then we lock our services so they only work from the LAN
-iptables -I INPUT 1 -i ${BRIDGE} -j ACCEPT
+iptables -I INPUT 1 -i ${bridge} -j ACCEPT
 iptables -I INPUT 1 -i lo -j ACCEPT
-iptables -A INPUT -p UDP --dport bootps -i ${WAN} -j REJECT
-iptables -A INPUT -p UDP --dport domain -i ${WAN} -j REJECT
+iptables -A INPUT -p UDP --dport bootps -i ${wan} -j REJECT
+iptables -A INPUT -p UDP --dport domain -i ${wan} -j REJECT
 
 # Allow access to my Samba server (which is restricted to a small set of users)
-iptables -A INPUT -p TCP --dport netbios-ssn -i ${WAN} -s ${LAN_IP} -j ACCEPT
-iptables -A INPUT -p TCP --dport microsoft-ds -i ${WAN} -s ${LAN_IP} -j ACCEPT
+iptables -A INPUT -p TCP --dport netbios-ssn -i ${wan} -s ${lan_ip} -j ACCEPT
+iptables -A INPUT -p TCP --dport microsoft-ds -i ${wan} -s ${lan_ip} -j ACCEPT
 
 # Allow NTP clients to work
 iptables -A INPUT -p UDP --dport ntp -j ACCEPT
 iptables -A OUTPUT -p UDP --sport ntp -j ACCEPT
 
 # Allow access to my SSH server (which only allows public key authentication)
-iptables -A INPUT -p TCP --dport ssh -i ${WAN} -s ${LAN_IP} -j ACCEPT
+iptables -A INPUT -p TCP --dport ssh -i ${wan} -s ${lan_ip} -j ACCEPT
 
 # Drop TCP / UDP packets to privileged ports
-iptables -A INPUT -p TCP -i ${WAN} -d 0/0 --dport 0:1023 -j DROP
-iptables -A INPUT -p UDP -i ${WAN} -d 0/0 --dport 0:1023 -j DROP
+iptables -A INPUT -p TCP -i ${wan} -d 0/0 --dport 0:1023 -j DROP
+iptables -A INPUT -p UDP -i ${wan} -d 0/0 --dport 0:1023 -j DROP
 
 # Quake/Xonotic/etc. need this port forwarded for LAN play
-iptables -A FORWARD -i ${BRIDGE} -p TCP --dport 26000 -j ACCEPT
-iptables -A FORWARD -i ${WAN} -p TCP --dport 26000 -j ACCEPT
-iptables -A FORWARD -i ${BRIDGE} -p UDP --dport 26000 -j ACCEPT
-iptables -A FORWARD -i ${WAN} -p UDP --dport 26000 -j ACCEPT
+iptables -A FORWARD -i ${bridge} -p TCP --dport 26000 -j ACCEPT
+iptables -A FORWARD -i ${wan} -p TCP --dport 26000 -j ACCEPT
+iptables -A FORWARD -i ${bridge} -p UDP --dport 26000 -j ACCEPT
+iptables -A FORWARD -i ${wan} -p UDP --dport 26000 -j ACCEPT
 
 # Finally we add the rules for NAT
-iptables -A FORWARD -i ${BRIDGE} -s 172.16.0.0/255.255.255.0 -j ACCEPT
-iptables -A FORWARD -i ${WAN} -d 172.16.0.0/255.255.255.0 -j ACCEPT
-iptables -t nat -A POSTROUTING -o ${WAN} -j MASQUERADE
+iptables -A FORWARD -i ${bridge} -s 172.16.0.0/255.255.255.0 -j ACCEPT
+iptables -A FORWARD -i ${wan} -d 172.16.0.0/255.255.255.0 -j ACCEPT
+iptables -t nat -A POSTROUTING -o ${wan} -j MASQUERADE
