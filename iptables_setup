@@ -11,9 +11,7 @@ iptables -P FORWARD DROP
 
 WAN=wan0
 BRIDGE=br0
-# PACBOOK=172.22.4.90
-PACBOOK=pacbook
-PACCENTRE=paccentre
+LAN_IP=192.168.178.0/24
 
 # Then we lock our services so they only work from the LAN
 iptables -I INPUT 1 -i ${BRIDGE} -j ACCEPT
@@ -22,16 +20,15 @@ iptables -A INPUT -p UDP --dport bootps -i ${WAN} -j REJECT
 iptables -A INPUT -p UDP --dport domain -i ${WAN} -j REJECT
 
 # Allow access to my Samba server (which is restricted to a small set of users)
-iptables -A INPUT -p TCP --dport netbios-ssn -i ${WAN} -s ${PACCENTRE} -j ACCEPT
-iptables -A INPUT -p TCP --dport microsoft-ds -i ${WAN} -s ${PACBOOK} -j ACCEPT
-iptables -A INPUT -p TCP --dport microsoft-ds -i ${WAN} -s ${PACCENTRE} -j ACCEPT
+iptables -A INPUT -p TCP --dport netbios-ssn -i ${WAN} -s ${LAN_IP} -j ACCEPT
+iptables -A INPUT -p TCP --dport microsoft-ds -i ${WAN} -s ${LAN_IP} -j ACCEPT
 
 # Allow NTP clients to work
 iptables -A INPUT -p UDP --dport ntp -j ACCEPT
 iptables -A OUTPUT -p UDP --sport ntp -j ACCEPT
 
 # Allow access to my SSH server (which only allows public key authentication)
-iptables -A INPUT -p TCP --dport ssh -i ${WAN} -s 192.168.178.1/24 -j ACCEPT
+iptables -A INPUT -p TCP --dport ssh -i ${WAN} -s ${LAN_IP} -j ACCEPT
 
 # Drop TCP / UDP packets to privileged ports
 iptables -A INPUT -p TCP -i ${WAN} -d 0/0 --dport 0:1023 -j DROP
