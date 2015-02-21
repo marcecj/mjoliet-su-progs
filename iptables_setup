@@ -20,6 +20,7 @@ iptables -A INPUT -p UDP --dport bootps -i ${wan} -j REJECT
 iptables -A INPUT -p UDP --dport domain -i ${wan} -j REJECT
 
 # Allow access to my Samba server (which is restricted to a small set of users)
+iptables -A INPUT -p UDP --dport netbios-ns -i ${wan} -s ${lan_ip} -j ACCEPT
 iptables -A INPUT -p TCP --dport netbios-ssn -i ${wan} -s ${lan_ip} -j ACCEPT
 iptables -A INPUT -p TCP --dport microsoft-ds -i ${wan} -s ${lan_ip} -j ACCEPT
 
