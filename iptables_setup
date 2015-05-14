@@ -1,8 +1,7 @@
 #!/bin/sh
 
-# A simple script that sets up iptables NAT *correctly*.
+# A simple script that sets up iptables *correctly*.
 iptables -F
-iptables -t nat -F
 
 # Setup default policies to handle unmatched traffic
 iptables -P INPUT ACCEPT
