@@ -10,11 +10,9 @@ iptables -P OUTPUT ACCEPT
 iptables -P FORWARD DROP
 
 wan=wan0
-bridge=br0
 lan_ip=192.168.178.0/24
 
 # Then we lock our services so they only work from the LAN
-iptables -I INPUT 1 -i ${bridge} -j ACCEPT
 iptables -I INPUT 1 -i lo -j ACCEPT
 iptables -A INPUT -p UDP --dport bootps -i ${wan} -j REJECT
 iptables -A INPUT -p UDP --dport domain -i ${wan} -j REJECT
@@ -36,12 +34,5 @@ iptables -A INPUT -p TCP -i ${wan} -d 0/0 --dport 0:1023 -j DROP
 iptables -A INPUT -p UDP -i ${wan} -d 0/0 --dport 0:1023 -j DROP
 
 # Quake/Xonotic/etc. need this port forwarded for LAN play
-iptables -A FORWARD -i ${bridge} -p TCP --dport 26000 -j ACCEPT
 iptables -A FORWARD -i ${wan} -p TCP --dport 26000 -j ACCEPT
-iptables -A FORWARD -i ${bridge} -p UDP --dport 26000 -j ACCEPT
 iptables -A FORWARD -i ${wan} -p UDP --dport 26000 -j ACCEPT
-
-# Finally we add the rules for NAT
-iptables -A FORWARD -i ${bridge} -s 172.16.0.0/255.255.255.0 -j ACCEPT
-iptables -A FORWARD -i ${wan} -d 172.16.0.0/255.255.255.0 -j ACCEPT
-iptables -t nat -A POSTROUTING -o ${wan} -j MASQUERADE
