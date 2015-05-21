@@ -1,6 +1,8 @@
 #!/bin/sh
 
 DEFAULT_SOURCES="/
+/usr/portage/distfiles
+/usr/portage/packages
 /home
 /home/marcec/multimedia"
 SOURCES="${SOURCES:-$DEFAULT_SOURCES}"
