@@ -1,10 +1,10 @@
 #!/bin/sh
 
 DEFAULT_SOURCES="/
-/usr/portage/distfiles
-/usr/portage/packages
 /home
-/home/marcec/multimedia"
+/home/marcec/multimedia
+/usr/portage/distfiles
+/usr/portage/packages"
 SOURCES="${SOURCES:-$DEFAULT_SOURCES}"
 BACKUP_DIR="${BACKUP_DIR:-/media/MARCEC_BACKUP}"
 TARGET="$BACKUP_DIR/$(hostname)"
