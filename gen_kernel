@@ -52,12 +52,11 @@ then
     mount /boot || exit $?
 fi
 
-# 1.) install the kernel and the System.map file to /boot
+# 1.) install the kernel to /boot
 # 2.) copy the kernel configuration file to /etc/kernels/ (like genkernel does)
 # 3.) configure the boot loader
 kern_image="$(make image_name)"
 cp "$kern_image" "$kern_path" &&
-    cp System.map /boot/System.map-$cur_ver &&
     cp .config /etc/kernels/kernel-config-$cur_ver &&
     grub2-mkconfig -o /boot/grub/grub.cfg
 
