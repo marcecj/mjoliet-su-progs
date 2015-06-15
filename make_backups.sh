@@ -75,6 +75,14 @@ fi
 # define helper functions
 #
 
+ssh_cmd() {
+    if [ -z "$ssh_pipe" ]; then
+	btrfs receive "$@"
+    else
+	lzop -c | $ssh_pipe "lzop -d | btrfs receive $@"
+    fi
+}
+
 # transfers the subvolume, incrementally if a parent subvolume exists
 transfer_subvolume() {
     local src="$1"
@@ -86,9 +94,9 @@ transfer_subvolume() {
     echo "LOG: Transferring snapshot of '$src' to '$tgt'"
 
     if [ "$num_snapshots" -ge 2 ]; then
-        btrfs send -p "$parent_snapshot" "$current_snapshot" | $ssh_pipe btrfs receive "$tgt"
+        btrfs send -p "$parent_snapshot" "$current_snapshot" | ssh_cmd "$tgt"
     else
-        btrfs send "$current_snapshot" | $ssh_pipe btrfs receive "$tgt"
+        btrfs send "$current_snapshot" | ssh_cmd "$tgt"
     fi
 }
 
