@@ -10,7 +10,7 @@ BACKUP_DIR="${BACKUP_DIR:-/media/MARCEC_BACKUP}"
 TARGET="$BACKUP_DIR/$(hostname)"
 
 # allow ':' instead of '\n' (necessary if $SOURCES came from systemd)
-SOURCES=$(echo $SOURCES | tr ':' '\n')
+SOURCES=$(echo "$SOURCES" | tr ':' '\n')
 
 #
 # handle options
