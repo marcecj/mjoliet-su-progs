@@ -173,9 +173,9 @@ do
 
     if [ "$prefix" = "hourly" ];
     then
-        # make a snapshot of the source volume; we only need to keep two around
-        # for incremental send/receive
-        btrfs-snap -r "$d" "$prefix" 2
+        # make a snapshot of the source volume; keep three around so that
+        # incremental send/receive still works in case of a reboot during send
+        btrfs-snap -r "$d" "$prefix" 3
 
         if [ $? -ne 0 ]; then
             echo "\tError creating snapshot." >&2
