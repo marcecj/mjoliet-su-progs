@@ -1,13 +1,19 @@
 #!/bin/sh
 
 make_j="1"
-while getopts j: a
+make_l=""
+while getopts j:l: a
 do
     case $a in
 	j) make_j="$OPTARG";;
+	l) make_l="$OPTARG";;
 	\?) exit 1;;
     esac
 done
+
+if [ -z "$make_l" ]; then
+    make_l=$make_j
+fi
 
 # fail if we are not in a Linux source directory
 if [ "${PWD%%-*}" != "/usr/src/linux" ]
@@ -32,7 +38,7 @@ fi
 echo "Making linux-$cur_ver"
 
 # compile the kernel and its modules
-make -j$make_j && make -j$make_j modules_install
+make -j$make_j -l$make_l && make -j$make_j -l$make_l modules_install
 
 # the kernel build system returns 2 when compilation fails
 if [ $? = 2 ]
