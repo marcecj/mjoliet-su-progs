@@ -32,7 +32,7 @@ kern_path="/boot/kernel-$cur_ver"
 # name to make it unique
 kern_count=$(ls -1 "$kern_path"* 2>/dev/null| wc -l)
 if [ $kern_count -gt 0 ]; then
-    kern_path="$kern_path-c$kern_count"
+    extra_ver="-c$kern_count"
 fi
 
 echo "Making linux-$cur_ver"
@@ -62,8 +62,8 @@ fi
 # 2.) copy the kernel configuration file to /etc/kernels/ (like genkernel does)
 # 3.) configure the boot loader
 kern_image="$(make image_name)"
-cp "$kern_image" "$kern_path" &&
-    dracut --force --kver "$cur_ver" &&
+cp "$kern_image" "$kern_path$extra_ver" &&
+    dracut --force /boot/initramfs-$cur_ver${extra_ver}.img --kver "$cur_ver" &&
     cp .config /etc/kernels/kernel-config-$cur_ver &&
     grub2-mkconfig -o /boot/grub/grub.cfg
 
