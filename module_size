@@ -7,18 +7,7 @@
 #   06.01.2008 - finally fixed this so it finds all modules
 #   25.03.2012 - convert to POSIX shell
 
-MODULES_PATH="/lib/modules/$(uname -r)/"
-
-lsmod | awk '{print $1".ko"}' | sed 's/^Module//' | {
-while read MOD;
+lsmod | tail -n+2 | cut -d' ' -f1 | while read m;
 do
-    NEW_MOD=$(find $MODULES_PATH -iname $MOD)
-    # Sometimes a module name will contain underscores instead of dashes. This
-    # accommodates for those cases.
-    if [ -z "$NEW_MOD" ];
-    then 
-	NEW_MOD=$(find $MODULES_PATH -iname $(echo "$MOD" | tr _ -))
-    fi
-    echo "$NEW_MOD"
-done | uniq | tr '\n' '\0' | du -hsc --files0-from=- 2>/dev/null | sort -h $@
-}
+    modinfo -F filename $m
+done | tr '\n' '\0'| du -hsc --files0-from=- | sort -h $@
