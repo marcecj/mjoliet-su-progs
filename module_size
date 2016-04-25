@@ -10,4 +10,4 @@
 lsmod | tail -n+2 | cut -d' ' -f1 | while read m;
 do
     modinfo -F filename $m
-done | tr '\n' '\0'| du -hsc --files0-from=- | sort -h $@
+done | xargs du -hsc | sort -h $@
