@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Changelog:
+# Pre-git Changelog:
 #   06.01.2008 - finally fixed this so it finds all modules
 #   25.03.2012 - convert to POSIX shell
 
