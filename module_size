@@ -1,8 +1,5 @@
 #!/bin/sh
 #
-# Note that you should have your PATH specified correctly for the commands in
-# this script to be able to launch.
-#
 # Changelog:
 #   06.01.2008 - finally fixed this so it finds all modules
 #   25.03.2012 - convert to POSIX shell
