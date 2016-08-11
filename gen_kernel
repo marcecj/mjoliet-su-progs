@@ -65,7 +65,7 @@ kern_image="$(make image_name)"
 cp "$kern_image" "$kern_path$extra_ver" &&
     dracut --force /boot/initramfs-$cur_ver${extra_ver}.img --kver "$cur_ver" &&
     cp .config /etc/kernels/kernel-config-$cur_ver &&
-    grub2-mkconfig -o /boot/grub/grub.cfg
+    grub-mkconfig -o /boot/grub/grub.cfg
 
 if [ $? -ne 0 ]
 then
