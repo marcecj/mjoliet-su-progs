@@ -86,4 +86,4 @@ systemd-nspawn -M ${container_name} emerge-webrsync
 systemd-nspawn -M ${container_name} emerge --sync
 systemd-nspawn -M ${container_name} eix-update
 systemd-nspawn -M ${container_name} emerge @world -uDNv
-systemd-nspawn -M ${container_name} emerge -v asciidoc dblatex eix gentoolkit git virtual/pypy
+systemd-nspawn -M ${container_name} emerge -v asciidoc dblatex eix gentoolkit git virtual/pypy vim
