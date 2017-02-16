@@ -14,10 +14,10 @@ do
 done
 
 # create the initial container from the current stage3 image
-machinectl pull-tar --verify=no ${STAGE3_URL} ${container_name}
+machinectl pull-tar --verify=no "${STAGE3_URL}" "${container_name}"
 
 # make sure the machine mounts the systems distfiles as a read-only FS
-cat <<EOF > /etc/systemd/nspawn/${container_name}.nspawn
+cat <<EOF > "/etc/systemd/nspawn/${container_name}.nspawn"
 [Files]
 BindReadOnly=/home/marcec/projects/gentoo/:/home/marcec/gentoo/
 BindReadOnly=/usr/portage/distfiles/:/usr/portage/ro_distfiles/
@@ -26,7 +26,7 @@ EOF
 ### configure portage
 
 host_cpu_flags="$(grep CPU_FLAGS /etc/portage/make.conf)"
-systemd-nspawn -M ${container_name} sh -c "
+systemd-nspawn -M "${container_name}" sh -c "
 mkdir \
 	  /etc/portage/env \
 	  /etc/portage/package.accept_keywords \
@@ -82,8 +82,8 @@ EOF
 
 ### update the system and install desired packages
 
-systemd-nspawn -M ${container_name} emerge-webrsync
-systemd-nspawn -M ${container_name} emerge --sync
-systemd-nspawn -M ${container_name} eix-update
-systemd-nspawn -M ${container_name} emerge @world -uDNv
-systemd-nspawn -M ${container_name} emerge -v asciidoc dblatex eix gentoolkit git virtual/pypy vim
+systemd-nspawn -M "${container_name}" emerge-webrsync
+systemd-nspawn -M "${container_name}" emerge --sync
+systemd-nspawn -M "${container_name}" eix-update
+systemd-nspawn -M "${container_name}" emerge @world -uDNv
+systemd-nspawn -M "${container_name}" emerge -v asciidoc dblatex eix gentoolkit git virtual/pypy vim
