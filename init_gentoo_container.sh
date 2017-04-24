@@ -90,7 +90,6 @@ systemd-nspawn -M "${container_name}" emerge -v \
         app-portage/eix \
         app-portage/gentoolkit \
         app-text/asciidoc \
-        app-text/dblatex \
         dev-vcs/git \
         virtual/pypy
 systemd-nspawn -M "${container_name}" eix-update
