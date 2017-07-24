@@ -21,6 +21,7 @@ cat <<EOF > "/etc/systemd/nspawn/${container_name}.nspawn"
 [Files]
 BindReadOnly=/home/marcec/projects/gentoo/:/home/marcec/gentoo/
 BindReadOnly=/usr/portage/distfiles/:/usr/portage/ro_distfiles/
+TemporaryFileSystem=/var/tmp/portage/
 EOF
 
 ### configure portage
