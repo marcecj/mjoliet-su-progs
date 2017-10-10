@@ -1,10 +1,11 @@
 #!/bin/sh
 
-echo "\n(Potentialy) duplicated USE flags found:\n"
+echo "(Potentialy) duplicated USE flags found:"
 grep USE= /etc/portage/make.conf | cut -d\" -f2 | tr ' ' '\n' | while read USE_FLAG;
 do
     FINDS="$(grep --color "^[^#].* $USE_FLAG\([[:space:]]\|$\)\{1,\}" /etc/portage/package.use/*[!\~])"
     if [ -n "$FINDS" ]; then
-	echo "$USE_FLAG:\n$FINDS"
+	echo """$USE_FLAG:
+        $FINDS"""
     fi
 done
