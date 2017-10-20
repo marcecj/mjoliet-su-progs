@@ -45,8 +45,8 @@ echo 'app-text/asciidoc test.conf' > /etc/portage/package.env/test
 
 cat << EOF > /etc/portage/package.accept_keywords/asciidoc
 app-text/asciidoc **
-~dev-python/pypy-bin-5.6.0 ~amd64
-~virtual/pypy-5.6.0 ~amd64
+~dev-python/pypy-bin-5.9.0 ~amd64
+~virtual/pypy-5.9.0 ~amd64
 EOF
 
 cat << EOF > /etc/portage/package.use/asciidoc
