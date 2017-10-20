@@ -1,17 +1,21 @@
 #!/bin/sh
 
-BASE_URL="http://distfiles.gentoo.org/releases/amd64/autobuilds/"
-LATEST="${BASE_URL}latest-stage3-amd64-systemd.txt"
-STAGE3_URL="${BASE_URL}$(curl -s $LATEST | tail -n1 | cut -d' ' -f1)"
-
+arch="amd64"
+stage3_variant="-amd64-systemd"
 container_name="gentoo-amd64-systemd"
-while getopts n: a
+while getopts a:s:n: a
 do
     case $a in
+	a) arch="$OPTARG";;
+	s) stage3_variant="-$OPTARG";;
 	n) container_name="$OPTARG";;
 	\?) exit 1;;
     esac
 done
+
+BASE_URL="http://distfiles.gentoo.org/releases/${arch}/autobuilds/"
+LATEST="${BASE_URL}latest-stage3${stage3_variant}.txt"
+STAGE3_URL="${BASE_URL}$(curl -s $LATEST | tail -n1 | cut -d' ' -f1)"
 
 # create the initial container from the current stage3 image
 machinectl pull-tar --verify=no "${STAGE3_URL}" "${container_name}"
