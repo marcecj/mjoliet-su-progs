@@ -81,6 +81,7 @@ echo '${host_cpu_flags}' >> /etc/portage/make.conf
 
 cat << EOF >> /etc/portage/make.conf
 PORTAGE_RO_DISTDIRS=\"\\\${PORTDIR}/ro_distfiles\"
+PORTAGE_RSYNC_EXTRA_OPTS=\"--exclude=/ro_distfiles\"
 EMERGE_DEFAULT_OPTS=\"--with-bdeps=y --quiet-build=y --nospinner --jobs 2 --load-average 4 --keep-going\"
 EOF
 "
