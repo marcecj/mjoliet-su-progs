@@ -6,10 +6,10 @@ container_name="gentoo-amd64-systemd"
 while getopts a:s:n: a
 do
     case $a in
-	a) arch="$OPTARG";;
-	s) stage3_variant="-$OPTARG";;
-	n) container_name="$OPTARG";;
-	\?) exit 1;;
+        a) arch="$OPTARG";;
+        s) stage3_variant="-$OPTARG";;
+        n) container_name="$OPTARG";;
+        \?) exit 1;;
     esac
 done
 
@@ -33,11 +33,11 @@ EOF
 host_cpu_flags="$(grep CPU_FLAGS /etc/portage/make.conf)"
 systemd-nspawn -M "${container_name}" sh -c "
 mkdir \
-	  /etc/portage/env \
-	  /etc/portage/package.accept_keywords \
-	  /etc/portage/package.env \
-	  /etc/portage/package.use \
-	  /etc/portage/profile
+          /etc/portage/env \
+          /etc/portage/package.accept_keywords \
+          /etc/portage/package.env \
+          /etc/portage/package.use \
+          /etc/portage/profile
 
 echo 'app-text/asciidoc -python_targets_pypy -python_single_target_pypy' > /etc/portage/profile/package.use.mask
 echo 'FEATURES=\"\${FEATURES} test\"' > /etc/portage/env/test.conf
