@@ -37,7 +37,7 @@ fi
 # so make sure it is if $CONFIG_DIR does not exist
 [ -d "$CONFIG_DIR" ] || CONFIG_DIR=""
 
-systemd-nspawn -U -M "${container_name}" --bind-ro="${CONFIG_DIR}":/root/container.conf/ sh -s <<EOF
+systemd-nspawn --user root -U -M "${container_name}" --bind-ro="${CONFIG_DIR}":/root/container.conf/ sh -s <<EOF
 
 # install custom files into the file system
 if [ -d /root/container.conf/filesystem ]
