@@ -2,13 +2,15 @@
 
 arch="amd64"
 stage3_variant="-amd64-systemd"
-container_name="gentoo-amd64-systemd"
 config_base_dir="${XDG_CONFIG_HOME:-$HOME/.config}/gentoo_containers"
+configuration="gentoo-amd64-systemd"
+container_name=""
 
-while getopts a:d:s:n: a
+while getopts a:c:d:s:n: a
 do
     case $a in
         a) arch="$OPTARG";;
+        c) configuration="$OPTARG";;
         d) if [ ! -d "$OPTARG" ]; then echo >&2 "Error: path \"$OPTARG\" does not exist."; exit 1; fi
 	config_base_dir="$OPTARG";;
         s) stage3_variant="-$OPTARG";;
@@ -17,7 +19,11 @@ do
     esac
 done
 
-CONFIG_DIR="${config_base_dir}/${container_name}"
+if [ -z "${container_name}" ]; then
+    container_name="${configuration}"
+fi
+
+CONFIG_DIR="${config_base_dir}/${configuration}"
 BASE_URL="http://distfiles.gentoo.org/releases/${arch}/autobuilds/"
 LATEST="${BASE_URL}latest-stage3${stage3_variant}.txt"
 STAGE3_URL="${BASE_URL}$(curl -s $LATEST | tail -n1 | cut -d' ' -f1)"
