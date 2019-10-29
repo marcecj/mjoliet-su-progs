@@ -1,0 +1,16 @@
+#!/bin/sh
+
+if [ -z "$1" ]; then
+    echo "No block device specified" >&2
+    exit
+fi
+
+block_path="/sys/block/$1"
+if [ ! -d "$block_path" ]; then
+    echo "Invalid block device \"$1\"" >&2
+    exit
+fi
+
+scsi_host=$(readlink "$block_path")
+echo 1 > "$block_path"/device/reset
+echo "- - -" > /sys/class/scsi_host/"$scsi_host"/scan
