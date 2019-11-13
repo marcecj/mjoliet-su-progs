@@ -12,5 +12,5 @@ if [ ! -d "$block_path" ]; then
 fi
 
 scsi_host=$(readlink "$block_path")
-echo 1 > "$block_path"/device/reset
+echo 1 > "$block_path"/device/delete
 echo "- - -" > /sys/class/scsi_host/"$scsi_host"/scan
