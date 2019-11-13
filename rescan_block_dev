@@ -11,6 +11,7 @@ if [ ! -d "$block_path" ]; then
     exit
 fi
 
-scsi_host=$(readlink "$block_path")
+scsi_host=$(readlink -f "$block_path" | sed -e 's:\(.*/host[0-9]\+\)/.*:\1:g')
+
 echo 1 > "$block_path"/device/delete
-echo "- - -" > /sys/class/scsi_host/"$scsi_host"/scan
+echo "- - -" > "$scsi_host"/scan
