@@ -13,7 +13,7 @@ do
     esac
 done
 
-if [ -z "$my_groups" -o -z "$my_paths" ]
+if [ -z "$my_groups" ] || [ -z "$my_paths" ]
 then
     print_usage
     exit 1
