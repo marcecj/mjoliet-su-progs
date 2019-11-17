@@ -18,7 +18,7 @@ fi
 # fail if we are not in a Linux source directory
 if [ "${PWD%%-*}" != "/usr/src/linux" ]
 then
-    echo "Not in a linux src directory: ${PWD}!\n" >&2
+    echo "Not in a linux src directory: ${PWD}!" >&2
     exit 1
 fi
 
