@@ -22,7 +22,7 @@ fi
 for group in $my_groups; do
   echo "for group $group"
   for dir in $my_paths; do
-    echo "\tChecking in $dir..."
+    printf "\tChecking in %s...\n" "$dir"
     find "$dir" -xdev -user "$group" -print
   done
 done
