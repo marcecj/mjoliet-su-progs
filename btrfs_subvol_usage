@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import collections
 import subprocess
 
 import btrfsutil
@@ -26,9 +25,10 @@ if __name__ == '__main__':
         print(e)
         exit(1)
 
-    res = [l.split() for l in res.decode().splitlines()[2:]]
-    qgroups = {int(l[0].split('/')[1]): l[1:] for l in res}
-    subvols = dict(e for e in btrfsutil.SubvolumeIterator(args.path, info=True))
+    res = [line.split() for line in res.decode().splitlines()[2:]]
+    qgroups = {int(line[0].split('/')[1]): line[1:] for line in res}
+    subvols = dict(e for e in
+                   btrfsutil.SubvolumeIterator(args.path, info=True))
 
     subvol_usage = [(subvol_path, *qgroups[subvol_info.id])
                     for subvol_path, subvol_info in subvols.items()]
