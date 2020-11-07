@@ -13,6 +13,7 @@ if __name__ == '__main__':
     )
     parser.add_argument(
         "path",
+        nargs='?',
         default='/'
     )
     args = parser.parse_args()
